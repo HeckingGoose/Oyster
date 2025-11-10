@@ -1,4 +1,4 @@
-﻿namespace Oyster.AbstractTypes
+﻿namespace Oyster.AbstractTypes.Player
 {
     public abstract class A_PlayerTalker
     {

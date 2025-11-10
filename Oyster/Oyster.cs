@@ -1,5 +1,7 @@
 ﻿using Oyster.AbstractTypes;
 using Oyster.AbstractTypes.Character;
+using Oyster.AbstractTypes.Player;
+using Oyster.AbstractTypes.Scene;
 using System.Diagnostics;
 
 namespace Oyster
@@ -39,11 +41,61 @@ namespace Oyster
         private static A_SceneScript? _sceneScript;
         private static A_PlayerTalker? _playerScript;
         private static A_CharacterTalker? _characterScript;
+        // < Conversation Loading >
+        private static A_BackgroundAssetLoader<string>? _scriptLoader;
+        private static string? _rawScript;
 
         // Constructor
         static Oyster()
         {
             // Do nothing
+        }
+
+        // Private Methods
+        /// <summary>
+        /// Called when _scriptLoader finishes.
+        /// </summary>
+        private static void OnScriptLoaded(A_BackgroundAssetLoader<string>.LoadResult loadResult, string log)
+        {
+            // Did it load successfully?
+            switch (loadResult)
+            {
+                // Yes
+                case A_BackgroundAssetLoader<string>.LoadResult.Succeeded:
+                    // Cache raw script
+                    _rawScript = _scriptLoader!.Asset;
+
+                    // Begin converting to a conversation.
+                    break;
+
+                // No
+                case A_BackgroundAssetLoader<string>.LoadResult.Failed:
+                default:
+                    // Then log issue and end conversation
+                    Debug.WriteLine(log);
+                    EndChat();
+                    break;
+            }
+
+            // Now that we're done we should clean up the script loading stuff
+            _scriptLoader = null;
+        }
+        /// <summary>
+        /// Cleans up after a conversation.
+        /// </summary>
+        private static void EndChat()
+        {
+            // Tell the player's speech display to hide itself
+            if (_playerScript != null) _playerScript.SpeechDisplay.Hide();
+
+            // And now tell the scene script to reset itself
+            if (_sceneScript != null) _sceneScript.ShowObjectsPostChat();
+
+            // Now null everything out
+            _playerScript = null;
+            _characterScript = null;
+            _sceneScript = null;
+            _rawScript = null;
         }
 
         // Public Methods
@@ -86,7 +138,13 @@ namespace Oyster
             _playerScript.SpeechDisplay.Show();
             Debug.WriteLine("Told the player to show their speech display.");
 
-            // TODO: Tell the thingy to start loading. This should not be IMPLEMENTED here though, as it's up to the game to manage file loading.
+            // Begin loading the script for this conversation
+            _scriptLoader = _characterScript.Data.BeginScriptLoad();
+            _scriptLoader.BeginAssetLoad();
+            Debug.WriteLine("Loading script for conversation.");
+
+            _scriptLoader.OnLoadFinished += OnScriptLoaded;
+            return true;
         }
 
         // Accessors

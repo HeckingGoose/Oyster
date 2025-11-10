@@ -1,7 +1,8 @@
 ﻿using Oyster.AbstractTypes.Character;
+using Oyster.AbstractTypes.Player;
 using Oyster.ImplementationInterfaces;
 
-namespace Oyster.AbstractTypes
+namespace Oyster.AbstractTypes.Scene
 {
     public abstract class A_SceneScript
     {

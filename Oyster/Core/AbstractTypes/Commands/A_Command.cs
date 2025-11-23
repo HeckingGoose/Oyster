@@ -11,7 +11,7 @@ namespace Oyster.Core.AbstractTypes.Commands
         // Protected Methods
         protected string LoadStringContainingVariable(string rawParameterValue)
         {
-
+            // We need a way to go through every character and search for variables
         }
         protected VariableType? ReadParameter<VariableType>(string rawParameterValue) where VariableType : class
         {

@@ -1,4 +1,4 @@
-﻿namespace Oyster.AbstractTypes
+﻿namespace Oyster.Core.AbstractTypes
 {
     public abstract class A_BackgroundAssetLoader<AssetType>
     {

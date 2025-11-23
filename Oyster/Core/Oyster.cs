@@ -1,10 +1,10 @@
-﻿using Oyster.AbstractTypes;
-using Oyster.AbstractTypes.Character;
-using Oyster.AbstractTypes.Player;
-using Oyster.AbstractTypes.Scene;
+﻿using Oyster.Core.AbstractTypes;
+using Oyster.Core.AbstractTypes.Character;
+using Oyster.Core.AbstractTypes.Player;
+using Oyster.Core.AbstractTypes.Scene;
 using System.Diagnostics;
 
-namespace Oyster
+namespace Oyster.Core
 {
     public static class Oyster
     {

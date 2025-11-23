@@ -1,4 +1,4 @@
-﻿namespace Oyster.AbstractTypes.Character
+﻿namespace Oyster.Core.AbstractTypes.Character
 {
     public abstract class A_CharacterTalker
     {

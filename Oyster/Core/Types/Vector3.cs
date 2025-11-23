@@ -1,4 +1,4 @@
-﻿namespace Oyster.Types
+﻿namespace Oyster.Core.Types
 {
     public class Vector3 : Vector
     {

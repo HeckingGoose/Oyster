@@ -1,6 +1,7 @@
-﻿using System.Drawing;
+﻿using Oyster.Core.AbstractTypes;
+using System.Drawing;
 
-namespace Oyster.AbstractTypes.Character
+namespace Oyster.Core.AbstractTypes.Character
 {
     public abstract class A_CharacterData
     {

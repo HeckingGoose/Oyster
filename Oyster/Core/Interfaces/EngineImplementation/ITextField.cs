@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Oyster.ImplementationInterfaces
+namespace Oyster.Core.Interfaces.EngineImplementation
 {
     public interface ITextField : IShowAndHide
     {

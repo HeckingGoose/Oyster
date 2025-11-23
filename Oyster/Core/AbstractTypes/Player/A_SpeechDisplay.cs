@@ -1,7 +1,7 @@
-﻿using Oyster.ImplementationInterfaces;
+﻿using Oyster.Core.Interfaces.EngineImplementation;
 using System.Drawing;
 
-namespace Oyster.AbstractTypes.Player
+namespace Oyster.Core.AbstractTypes.Player
 {
     public class A_SpeechDisplay : IShowAndHide
     {

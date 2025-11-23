@@ -8,17 +8,6 @@ namespace Oyster.Core
 {
     public static class Oyster
     {
-        // Const
-        private const char LINE_ENDING = '\n';
-        private const char COMMAND_DATA_SPLITTER = ' ';
-        private const char DATA_START_CHAR = '[';
-        private const char DATA_END_CHAR = ']';
-        private const char COMMENT_CHAR = '#';
-        private const string BAD_LINE_ENDING = "\r";
-        private const int EXPECTED_SPLIT_SIZE = 2;
-        private const char PARAMETER_SEPERATOR = ',';
-        private const int PROMPT_WAIT_TIME = 4;
-
         // Enum
         public enum SpeechState
         {

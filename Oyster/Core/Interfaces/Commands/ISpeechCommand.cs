@@ -13,6 +13,6 @@
         /// </summary>
         /// <param name="rawParameters">An array of raw parameters.</param>
         /// <returns>A valid object that implements ISpeechCommand.</returns>
-        public ISpeechCommand MakeSelf(string[] rawParameters);
+        public ISpeechCommand CreateSelf(string[] rawParameters);
     }
 }

@@ -10,9 +10,16 @@ namespace Oyster.Core.AbstractTypes.Commands
 
         // Protected Methods
         /// <summary>
+        /// Splits the given string into a name and a parameter value.
+        /// </summary>
+        protected static string[] SplitIntoVariableAndData(string raw)
+        {
+            return raw.Split(Definitions.PARAMETER_NAMEVALUE_SPLITTER, 2);
+        }
+        /// <summary>
         /// Loads a parameter into a given variable of matching type.
         /// </summary>
-        protected void LoadParameterValue<VariableType>(string rawValue, ref VariableType? destination) where VariableType : class
+        protected static void LoadParameterValue<VariableType>(string rawValue, ref VariableType? destination)
         {
             // Load parameter
             destination = ReadParameter<VariableType>(rawValue);
@@ -22,7 +29,7 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// </summary>
         /// <param name="rawParameterValue">A string representing the parameter value.</param>
         /// <returns>A valid string containing at least the base string content, along with any successfully read variables inlined.</returns>
-        protected string LoadStringContainingVariables(string rawParameterValue)
+        protected static string LoadStringContainingVariables(string rawParameterValue)
         {
             // Declare output
             string output = string.Empty;
@@ -87,8 +94,8 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// </summary>
         /// <typeparam name="VariableType">The type to load the parameter as.</typeparam>
         /// <param name="rawParameterValue">A string representing the parameter value.</param>
-        /// <returns>A valid value on success, null on any failure.</returns>
-        protected VariableType? ReadParameter<VariableType>(string rawParameterValue) where VariableType : class
+        /// <returns>A valid value on success, default type value on any failure.</returns>
+        protected static VariableType? ReadParameter<VariableType>(string rawParameterValue)
         {
             // Does the value start with a variable declaration
             if (rawParameterValue[0] == Definitions.PARAMETER_VARIABLE)
@@ -97,7 +104,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                 if (typeof(VariableType) == typeof(string) && rawParameterValue[1] == '"')
                 {
                     // Then return it using this specific method
-                    return (LoadStringContainingVariables(rawParameterValue.Substring(2, rawParameterValue.Length - 3)) as VariableType)!;
+                    return ((VariableType)(object)LoadStringContainingVariables(rawParameterValue.Substring(2, rawParameterValue.Length - 3)))!;
                 }
 
                 // Otherwise let's just fetch the value
@@ -108,7 +115,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                 {
                     // Log issue
                     Debug.WriteLine($"Unable to load variable '{rawParameterValue.Substring(1)}', as variable does not exist!");
-                    return null;
+                    return default;
                 }
 
                 // Type mismatch?
@@ -116,7 +123,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                 {
                     // Log issue
                     Debug.WriteLine($"Unable to load variable '{rawParameterValue.Substring(1)}', as types do not match!");
-                    return null;
+                    return default;
                 }
 
                 // We can assume it's correct so return this
@@ -131,7 +138,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                     // Parse it, on fail return null
                     if (int.TryParse(rawParameterValue, out int i)) return (VariableType)(object)i;
                     Debug.WriteLine($"Unable to parse parameter value '{rawParameterValue}' as an integer!");
-                    return null;
+                    return default;
 
                 // A string
                 case Type t when t == typeof(string):
@@ -141,7 +148,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                     {
                         // Return null
                         Debug.WriteLine($"Parameter value '{rawParameterValue}' is not a valid string!");
-                        return null;
+                        return default;
                     }
 
                     // Return trimmed string
@@ -152,16 +159,16 @@ namespace Oyster.Core.AbstractTypes.Commands
                     // Parse it, on fail return null
                     if (bool.TryParse(rawParameterValue, out bool b)) return (VariableType)(object)b;
                     Debug.WriteLine($"Unable to parse parameter value '{rawParameterValue}' as a boolean!");
-                    return null;
+                    return default;
             }
 
             // Invalid type given
             Debug.WriteLine($"Invalid type '{nameof(VariableType)}' provided!");
-            return null;
+            return default;
         }
 
         // Public Methods
-        public abstract ISpeechCommand MakeSelf(string[] rawParameters);
+        public abstract ISpeechCommand CreateSelf(string[] rawParameters);
         public abstract bool Run();
     }
 }

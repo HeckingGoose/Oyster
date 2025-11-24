@@ -18,6 +18,7 @@
         internal const char PARAMETER_STRING_DELIMINATOR = '\"';
         internal const char PARAMETER_VARIABLE_INLINE_START = '{';
         internal const char PARAMETER_VARIABLE_INLINE_END = '}';
+        internal const char PARAMETER_NAMEVALUE_SPLITTER = '=';
 
         // Variable stuff
         internal const string VARIABLE_NOTEXISTS_FORSTRING = "???";

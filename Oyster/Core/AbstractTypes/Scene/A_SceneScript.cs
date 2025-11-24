@@ -29,7 +29,7 @@ namespace Oyster.Core.AbstractTypes.Scene
             A_PlayerTalker playerTalker,
             A_CharacterTalker characterTalker
             )
-        { Oyster.StartChat(this, playerTalker, characterTalker); }
+        { OysterMain.StartChat(this, playerTalker, characterTalker); }
         /// <summary>
         /// Hides all objects that should be hidden before starting conversation.
         /// </summary>

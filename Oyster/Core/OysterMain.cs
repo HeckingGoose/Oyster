@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Oyster.Core
 {
-    public static class Oyster
+    public static class OysterMain
     {
         // Enum
         public enum SpeechState
@@ -35,7 +35,7 @@ namespace Oyster.Core
         private static string? _rawScript;
 
         // Constructor
-        static Oyster()
+        static OysterMain()
         {
             // Do nothing
         }
@@ -137,6 +137,17 @@ namespace Oyster.Core
         }
 
         // Accessors
+        /// <summary>
+        /// Gets or sets the current script that Oyster is working with.
+        /// </summary>
         public static A_SceneScript? SceneScript { get { return _sceneScript; } set { _sceneScript = value; } }
+        /// <summary>
+        /// Gets or sets Oyster's reference to the player's speech script.
+        /// </summary>
+        public static A_PlayerTalker? PlayerTalker { get { return _playerScript; } set { _playerScript = value; } }
+        /// <summary>
+        /// Gets or sets Oyster's reference to the character's speech script.
+        /// </summary>
+        public static A_CharacterTalker? CharacterTalker { get { return _characterScript; } set { _characterScript = value; } }
     }
 }

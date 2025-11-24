@@ -22,5 +22,16 @@
             // If not then return null
             else return (null, null);
         }
+        /// <summary>
+        /// Creates a named variable with a given value.
+        /// </summary>
+        public static void AddVariable<VariableType>(string name, VariableType value) where VariableType : class
+        {
+            // Does dictionary contain this key? If so update value
+            if (_variables.ContainsKey(name)) _variables[name] = (value, typeof(VariableType));
+
+            // If it does not then add it
+            else _variables.Add(name, (value, typeof(VariableType)));
+        }
     }
 }

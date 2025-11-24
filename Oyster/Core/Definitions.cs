@@ -16,5 +16,10 @@
         internal const char PARAMETER_SEPERATOR = ',';
         internal const char PARAMETER_VARIABLE = '$';
         internal const char PARAMETER_STRING_DELIMINATOR = '\"';
+        internal const char PARAMETER_VARIABLE_INLINE_START = '{';
+        internal const char PARAMETER_VARIABLE_INLINE_END = '}';
+
+        // Variable stuff
+        internal const string VARIABLE_NOTEXISTS_FORSTRING = "???";
     }
 }

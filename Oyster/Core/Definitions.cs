@@ -1,7 +1,11 @@
 ﻿namespace Oyster.Core
 {
-    internal class Definitions
+    internal static class Definitions
     {
+        // Metadata Definitions
+        internal const string VERSION_NUMBER_STRING = "4.1.0";
+        internal const string VERSION_NAME_STRING = "Base";
+
         // Conversation Definitions
         internal const char LINE_ENDING = '\n';
         internal const char COMMAND_DATA_SPLITTER = ' ';
@@ -22,5 +26,9 @@
 
         // Variable stuff
         internal const string VARIABLE_NOTEXISTS_FORSTRING = "???";
+
+        // Tickrate Definitions
+        internal const int TICKRATE_PERSECOND = 80;
+        internal const float TICKRATE_WAITTIME = 1f / TICKRATE_PERSECOND;
     }
 }

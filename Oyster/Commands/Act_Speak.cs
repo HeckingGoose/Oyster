@@ -19,20 +19,18 @@ namespace Oyster.Commands
         private string _textToDisplay;
         private float _timer;
         private int _currentCharacterIndex;
-        private bool _instant;
-        private bool _waitForUserInput;
 
         // Constructors
         private Act_Speak(
             string textToDisplay,
             bool instant,
             bool waitForUserInput
-            )
+            ) : base()
         {
             // Pass in values
             _textToDisplay = textToDisplay;
-            _instant = instant;
-            _waitForUserInput = waitForUserInput;
+            _optionalParameters.Add(PARAMETER_INSTANT_NAME, (instant, typeof(bool)));
+            _optionalParameters.Add(PARAMETER_WAITFORUSERINPUT_NAME, (waitForUserInput, typeof(bool)));
 
             // Default
             _timer = START_POS;
@@ -50,8 +48,6 @@ namespace Oyster.Commands
         {
             // Declare stores
             string? textToDisplay = string.Empty;
-            bool instant = DEFAULT_INSTANT;
-            bool waitForUserInput = DEFAULT_WAITFORUSERINPUT;
 
             // Attempt to read in the first value as a string
             LoadParameterValue(rawParameters[0], ref textToDisplay);
@@ -59,31 +55,18 @@ namespace Oyster.Commands
             // On fail return null
             if (textToDisplay == null) { return null; }
 
-            // Now let's look through every other parameter that was given
-            for (int i = 1; i < rawParameters.Length; i++)
+            // Now read in any optional parameters
+            Dictionary<string, (object value, Type type)> optionals = new Dictionary<string, (object value, Type type)>
             {
-                // Split across the splitter
-                string[] split = SplitIntoVariableAndData(rawParameters[i]);
-
-                // Let's see what we've got
-                switch (split[0].ToLower())
-                {
-                    // This is referring to instant
-                    case PARAMETER_INSTANT_NAME:
-                        // Read in the bool
-                        LoadParameterValue(split[i], ref instant);
-                        break;
-
-                    // This is referring to the waiting
-                    case PARAMETER_WAITFORUSERINPUT_NAME:
-                        // Read it in
-                        LoadParameterValue(split[1], ref waitForUserInput);
-                        break;
-                }
-            }
+                { PARAMETER_INSTANT_NAME, (DEFAULT_INSTANT, typeof(bool)) },
+                { PARAMETER_WAITFORUSERINPUT_NAME, (DEFAULT_WAITFORUSERINPUT, typeof(bool)) }
+            };
+            List<string> t = [.. rawParameters];
+            t.RemoveAt(0);
+            LoadOptionalParameterValues(t.ToArray(), ref optionals);
 
             // Make and return self
-            return new Act_Speak(textToDisplay, instant, waitForUserInput);
+            return new Act_Speak(textToDisplay, (bool)optionals[PARAMETER_INSTANT_NAME].value, (bool)optionals[PARAMETER_WAITFORUSERINPUT_NAME].value);
         }
         public override bool Run()
         {
@@ -96,7 +79,7 @@ namespace Oyster.Commands
             }
 
             // Is this text intended to be instant?
-            if (_instant)
+            if ((bool)_optionalParameters[PARAMETER_INSTANT_NAME].value)
             {
                 DumpAllRemaining();
             }
@@ -105,11 +88,11 @@ namespace Oyster.Commands
             if (_currentCharacterIndex >= _textToDisplay.Length)
             {
                 // Return true if allowed to auto-progress
-                return !_waitForUserInput;
+                return !(bool)_optionalParameters[PARAMETER_WAITFORUSERINPUT_NAME].value;
             }
 
             // Are we ready for the next character?
-            if (_timer > speechSystem.NPC.CharacterData.TimeBetweenCharacters)
+            if (_timer > OysterMain.CharacterTalker!.Data.TimeBetweenCharacters)
             {
                 // Reset it
                 _timer = START_POS;
@@ -130,7 +113,7 @@ namespace Oyster.Commands
             }
 
             // Increment timer
-            _timer += Time.deltaTime;
+            _timer += Definitions.TICKRATE_WAITTIME;
 
             // Return that we're not done yet
             return false;
@@ -148,7 +131,7 @@ namespace Oyster.Commands
             else
             {
                 // Time to skip! To do this we just tell ourself that we no longer care for user input
-                _waitForUserInput = false;
+                _optionalParameters[PARAMETER_WAITFORUSERINPUT_NAME] = (false, typeof(bool));
             }
         }
 

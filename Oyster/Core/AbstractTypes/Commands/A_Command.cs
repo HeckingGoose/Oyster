@@ -5,8 +5,11 @@ namespace Oyster.Core.AbstractTypes.Commands
 {
     public abstract class A_Command : ISpeechCommand
     {
+        // Protected Variables
+        protected Dictionary<string, (object value, Type type)> _optionalParameters;
+
         // Constructor
-        public A_Command() { }
+        public A_Command() { _optionalParameters = new Dictionary<string, (object value, Type type)>(); }
 
         // Protected Methods
         /// <summary>
@@ -24,12 +27,60 @@ namespace Oyster.Core.AbstractTypes.Commands
             // Load parameter
             destination = ReadParameter<VariableType>(rawValue);
         }
+        protected static void LoadOptionalParameterValues(string[] optionalParameters, ref Dictionary<string, (object value, Type type)> destination)
+        {
+            // Iterate every parameter
+            for (int i = 1; i < optionalParameters.Length; i++)
+            {
+                // Split across the splitter
+                string[] split = SplitIntoVariableAndData(optionalParameters[i]);
+
+                // Iterate every value in the dictionary
+                foreach (KeyValuePair<string, (object value, Type type)> kvp in destination)
+                {
+                    // Check if split is right size. If not then skip it.
+                    if (split.Length != 2) continue;
+
+                    // Check if the key matches
+                    if (split[0] == kvp.Key)
+                    {
+                        // What type is this?
+                        switch (kvp.Value.type)
+                        {
+                            // Boolean
+                            case Type t when t == typeof(bool):
+                                destination[kvp.Key] = (ReadParameter<bool>(split[1]), kvp.Value.type);
+                                break;
+
+                            // Int
+                            case Type t when t == typeof(int):
+                                destination[kvp.Key] = (ReadParameter<int>(split[1]), kvp.Value.type);
+                                break;
+
+                            // String
+                            case Type t when t == typeof(string):
+                                // Cache value
+                                object o = kvp.Value.value!;
+
+                                // Do thing
+                                destination[kvp.Key] = (ReadParameter<string>(split[1]), kvp.Value.type)!;
+
+                                // If null then use default
+                                if (destination[kvp.Key].value == null) destination[kvp.Key] = (o, kvp.Value.type);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Private Methods
         /// <summary>
         /// Parses a string for any variable declarations and inlines their value within the string.
         /// </summary>
         /// <param name="rawParameterValue">A string representing the parameter value.</param>
         /// <returns>A valid string containing at least the base string content, along with any successfully read variables inlined.</returns>
-        protected static string LoadStringContainingVariables(string rawParameterValue)
+        private static string LoadStringContainingVariables(string rawParameterValue)
         {
             // Declare output
             string output = string.Empty;
@@ -95,7 +146,7 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// <typeparam name="VariableType">The type to load the parameter as.</typeparam>
         /// <param name="rawParameterValue">A string representing the parameter value.</param>
         /// <returns>A valid value on success, default type value on any failure.</returns>
-        protected static VariableType? ReadParameter<VariableType>(string rawParameterValue)
+        private static VariableType? ReadParameter<VariableType>(string rawParameterValue)
         {
             // Does the value start with a variable declaration
             if (rawParameterValue[0] == Definitions.PARAMETER_VARIABLE)

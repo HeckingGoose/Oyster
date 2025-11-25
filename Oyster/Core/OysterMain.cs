@@ -19,11 +19,13 @@ namespace Oyster.Core
         // Delegates
         public delegate void PuppetCall(string command);
         public delegate void BlankDelegate();
+        public delegate (string number, string name) VersionGetDelegate();
 
         // Events
         public static event PuppetCall? OnPuppetCalled;
         public static event BlankDelegate? OnSpeechCompleted;
         public static event BlankDelegate? OnScriptGenerated;
+        public static event VersionGetDelegate OnVersionGetRequest;
 
         // Private Variables
         // < Scene Objects >
@@ -86,6 +88,10 @@ namespace Oyster.Core
             _sceneScript = null;
             _rawScript = null;
         }
+        /// <summary>
+        /// Fetches the version number and name for this build of Oyster.
+        /// </summary>
+        private static (string number, string name) InternalNumberAndName() { return (Definitions.VERSION_NUMBER_STRING, Definitions.VERSION_NAME_STRING); }
 
         // Public Methods
         /// <summary>
@@ -134,6 +140,17 @@ namespace Oyster.Core
 
             _scriptLoader.OnLoadFinished += OnScriptLoaded;
             return true;
+        }
+        /// <summary>
+        /// Fetches the version number and name of this Oyster runtime. Set the 'OnVersionGetRequest' event to return custom values. This method is used for logging potential incompatibility with scripts.
+        /// </summary>
+        public static (string number, string name) GetVersionNumberAndName()
+        {
+            // Raise event if subbed
+            if (OnVersionGetRequest != null) return OnVersionGetRequest();
+
+            // Otherwise use default
+            return (Definitions.VERSION_NUMBER_STRING, Definitions.VERSION_NAME_STRING);
         }
 
         // Accessors

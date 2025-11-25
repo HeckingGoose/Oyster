@@ -2,6 +2,7 @@
 using Oyster.Core.AbstractTypes.Character;
 using Oyster.Core.AbstractTypes.Player;
 using Oyster.Core.AbstractTypes.Scene;
+using Oyster.Core.Interfaces.Commands;
 using System.Diagnostics;
 
 namespace Oyster.Core
@@ -17,6 +18,7 @@ namespace Oyster.Core
         }
 
         // Delegates
+        public delegate ISpeechCommand CommandCreationDelegate(string[] parameters);
         public delegate void PuppetCall(string command);
         public delegate void BlankDelegate();
         public delegate (string number, string name) VersionGetDelegate();
@@ -24,26 +26,132 @@ namespace Oyster.Core
         // Events
         public static event PuppetCall? OnPuppetCalled;
         public static event BlankDelegate? OnSpeechCompleted;
-        public static event BlankDelegate? OnScriptGenerated;
+        public static event BlankDelegate? OnScriptReady;
         public static event VersionGetDelegate OnVersionGetRequest;
 
         // Private Variables
+        // < General >
+        private static SpeechState _oysterState;
+        private static float _timeSinceLastFrame;
         // < Scene Objects >
         private static A_SceneScript? _sceneScript;
         private static A_PlayerTalker? _playerScript;
         private static A_CharacterTalker? _characterScript;
         // < Conversation Loading >
         private static A_BackgroundAssetLoader<string>? _scriptLoader;
-        private static string? _rawScript;
+        private static Speech_Line[]? _rawScript;
+        private static Dictionary<string, CommandCreationDelegate> _validCommands;
+        // < Conversation Assets >
+        private static ISpeechCommand[] _script;
+        private static int _currentCommandIndex;
+        private static int _nextCommandToLoadIndex;
+        private static bool _safeToLoadMoreCommands;
 
         // Constructor
         static OysterMain()
         {
             // Set event
             OnVersionGetRequest = InternalNumberAndName;
+
+            // Set start state
+            _oysterState = SpeechState.NotTalking;
+
+            // Default array values
+            _script = Array.Empty<ISpeechCommand>();
+            _validCommands = new Dictionary<string, CommandCreationDelegate>();
         }
 
         // Private Methods
+        /// <summary>
+        /// Translates raw input into a slightly neater format. Ensures that all lines are somewhat valid commands.
+        /// </summary>
+        private static Speech_Line[] RawToLines(string[] rawLines)
+        {
+            // Create store (not matching input size due to some lines maybe needing to be ignored).
+            List<Speech_Line> output = new List<Speech_Line>();
+
+            // Iterate through every line
+            foreach (string line in rawLines)
+            {
+                // Does the line have absolutely anything on it??
+                if (line == null || line == string.Empty)
+                {
+                    // If not then skip it
+                    continue;
+                }
+
+                // Does this line begin with a comment?
+                if (line[0] == Definitions.OSF_COMMENT_CHARACTER)
+                {
+                    // Skip it
+                    continue;
+                }
+
+                // Check for bad lines in general
+                if (line == Definitions.OSF_INVALID_LINEENDING) { continue; }
+
+                // Remove trailing \r
+                string clean = line.Split(Definitions.OSF_INVALID_LINEENDING, Definitions.OSF_CLEANER_EXPECTEDSPLITSIZE)[0];
+
+                // Attempt to split across the first space
+                string[] split = clean.Split(Definitions.OSF_COMMANDTODATA_SPLITTER, Definitions.OSF_CLEANER_EXPECTEDSPLITSIZE);
+
+                // Length check
+                if (split.Length < Definitions.OSF_CLEANER_EXPECTEDSPLITSIZE)
+                {
+                    // Skip
+                    continue;
+                }
+
+                // Check that the first and last characters match QED
+                if (split[1][0] != Definitions.OSF_DATA_START ||
+                    split[1][split[1].Length - 1] != Definitions.OSF_DATA_END)
+                {
+                    // Given that they don't then discard this line
+                    continue;
+                }
+
+                // Remove those characters
+                split[1] = split[1].Substring(1, split[1].Length - 2);
+
+                // Attempt to fetch the command
+                string command = string.Empty;
+                split[0] = split[0].ToLower();
+                if (_validCommands.ContainsKey(split[0])) command = split[0];
+
+                // Is this command valid?
+                if (command == string.Empty)
+                {
+                    // If not then skip this line
+                    Debug.WriteLine($"Unknown command '{split[0]}' found during linting!");
+                    continue;
+                }
+
+                // Make a new line from these
+                output.Add(
+                    new Speech_Line(
+                        command,
+                        split[1]
+                        )
+                    );
+            }
+            return output.ToArray();
+        }
+        private static void LoadNextCommand()
+        {
+            // Is the next command out of range? If it is then just skip. (And mark it as unsafe to read more).
+            if (_nextCommandToLoadIndex >= _script.Length) { _safeToLoadMoreCommands = false; return; }
+
+            // Otherwise let's figure out what this command is
+            // As we know it will be a valid command we can directly index and create it
+            _script[_nextCommandToLoadIndex] = _validCommands[_rawScript![_nextCommandToLoadIndex].CommandName].Invoke(_rawScript[_nextCommandToLoadIndex].Parameters);
+
+            // Is this command something that modifies variables? If so then we can't load more commands, as they may depend on variables existing.
+            if (_script[_nextCommandToLoadIndex] is IModifiesVariables) _safeToLoadMoreCommands = false;
+
+            // And increment to the next line
+            _nextCommandToLoadIndex++;
+        }
         /// <summary>
         /// Called when _scriptLoader finishes.
         /// </summary>
@@ -55,9 +163,21 @@ namespace Oyster.Core
                 // Yes
                 case A_BackgroundAssetLoader<string>.LoadResult.Succeeded:
                     // Cache raw script
-                    _rawScript = _scriptLoader!.Asset;
+                    _rawScript = RawToLines(_scriptLoader!.Asset!.Split(Definitions.OSF_VALID_LINEENDING));
 
-                    // Begin converting to a conversation.
+                    // Now using this we can initialise an array for storing lines
+                    _script = new ISpeechCommand[_rawScript.Length];
+
+                    // Set our indices
+                    _currentCommandIndex = 0;
+                    _nextCommandToLoadIndex = 0;
+
+                    // Now load our first command
+                    _safeToLoadMoreCommands = true;
+                    LoadNextCommand();
+
+                    // Invoke script loaded event
+                    if (OnScriptReady != null) OnScriptReady();
                     break;
 
                 // No
@@ -88,11 +208,47 @@ namespace Oyster.Core
             _characterScript = null;
             _sceneScript = null;
             _rawScript = null;
+
+            // And set state back
+            _oysterState = SpeechState.NotTalking;
         }
         /// <summary>
         /// Fetches the version number and name for this build of Oyster.
         /// </summary>
         private static (string number, string name) InternalNumberAndName() { return (Definitions.VERSION_NUMBER_STRING, Definitions.VERSION_NAME_STRING); }
+        /// <summary>
+        /// Runs a single tick of logic for Oyster.
+        /// </summary>
+        private static void Tick()
+        {
+            // What state are we in?
+            switch (_oysterState)
+            {
+                // In a conversation?
+                case SpeechState.Talking:
+                    Tick_Talk();
+                    break;
+            }
+        }
+        private static void Tick_Talk()
+        {
+            // Are we at the end of the conversation?
+            if (_currentCommandIndex >= _script.Length)
+            {
+                // End the chat
+                EndChat();
+            }
+
+            // Otherwise we should process the current line
+            if (_script[_currentCommandIndex].Run()) _currentCommandIndex++;
+
+            // Is it safe to load more lines?
+            if (_safeToLoadMoreCommands)
+            {
+                // Then load another!
+                LoadNextCommand();
+            }
+        }
 
         // Public Methods
         /// <summary>
@@ -139,7 +295,9 @@ namespace Oyster.Core
             _scriptLoader.BeginAssetLoad();
             Debug.WriteLine("Loading script for conversation.");
 
+            // Set self to loading state
             _scriptLoader.OnLoadFinished += OnScriptLoaded;
+            _oysterState = SpeechState.Loading;
             return true;
         }
         /// <summary>
@@ -152,6 +310,41 @@ namespace Oyster.Core
 
             // Otherwise use default
             return (Definitions.VERSION_NUMBER_STRING, Definitions.VERSION_NAME_STRING);
+        }
+        /// <summary>
+        /// Lets Oyster know that this command exists for when it loads scripts.
+        /// </summary>
+        /// <param name="name">The name of the command.</param>
+        /// <param name="creationMethod">The method that should be called to create an instance of the command.</param>
+        public static void AddCommand(string name, CommandCreationDelegate creationMethod)
+        {
+            // Cache this
+            name = name.ToLower();
+
+            // Overwrite if exists
+            if (_validCommands.ContainsKey(name)) { _validCommands[name] = creationMethod; return; }
+
+            // Otherwise add value
+            _validCommands.Add(name, creationMethod);
+        }
+        /// <summary>
+        /// Runs the next frame of logic for Oyster.
+        /// </summary>
+        /// <param name="deltaTime">The time since the last call to this method.</param>
+        public static void Update(float deltaTime)
+        {
+            // Add time
+            _timeSinceLastFrame += deltaTime;
+
+            // Loop until we've caught up
+            while (_timeSinceLastFrame > Definitions.TICKRATE_WAITTIME)
+            {
+                // Call tick
+                Tick();
+
+                // Decrement time
+                _timeSinceLastFrame -= Definitions.TICKRATE_WAITTIME;
+            }
         }
 
         // Accessors

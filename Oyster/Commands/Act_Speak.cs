@@ -9,8 +9,9 @@ namespace Oyster.Commands
         private Act_Speak(
             string textToDisplay,
             bool instant,
-            bool waitForUserInput
-            ) : base(textToDisplay, instant, waitForUserInput) { }
+            bool waitForUserInput,
+            bool mute
+            ) : base(textToDisplay, instant, waitForUserInput, mute) { }
 
         // Explicit Interface Implementations
         public override ISpeechCommand? CreateSelf(string[] rawParameters)
@@ -23,7 +24,7 @@ namespace Oyster.Commands
             Act_Append a = (Act_Append)Act_Append.MakeSelf(rawParameters)!;
 
             // Now read its values
-            return new Act_Speak(a.TextToDisplay, a.Instant, a.WaitForUserInput);
+            return new Act_Speak(a.TextToDisplay, a.Instant, a.WaitForUserInput, a.Mute);
         }
         public override bool Run()
         {

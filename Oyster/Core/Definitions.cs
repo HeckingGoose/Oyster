@@ -6,14 +6,17 @@
         internal const string VERSION_NUMBER_STRING = "4.1.0";
         internal const string VERSION_NAME_STRING = "Base";
 
+        // OSF File Definitions
+        internal const char OSF_VALID_LINEENDING = '\n';
+        internal const string OSF_INVALID_LINEENDING = "\r";
+        internal const int OSF_CLEANER_EXPECTEDSPLITSIZE = 2;
+        internal const char OSF_PARAMETER_SEPERATOR = ',';
+        internal const char OSF_COMMENT_CHARACTER = '#';
+        internal const char OSF_COMMANDTODATA_SPLITTER = ' ';
+        internal const char OSF_DATA_START = '[';
+        internal const char OSF_DATA_END = ']';
+
         // Conversation Definitions
-        internal const char LINE_ENDING = '\n';
-        internal const char COMMAND_DATA_SPLITTER = ' ';
-        internal const char DATA_START_CHAR = '[';
-        internal const char DATA_END_CHAR = ']';
-        internal const char COMMENT_CHAR = '#';
-        internal const string BAD_LINE_ENDING = "\r";
-        internal const int EXPECTED_SPLIT_SIZE = 2;
         internal const int PROMPT_WAIT_TIME = 4;
 
         // Parameter Formatting Definitions

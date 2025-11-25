@@ -107,6 +107,8 @@ namespace Oyster.Commands
                 _currentCharacterIndex += toAdd.Length;
             }
 
+            // TODO: Figure out how audio should be implemented
+
             // Increment timer
             _timer += Definitions.TICKRATE_WAITTIME;
 
@@ -161,5 +163,9 @@ namespace Oyster.Commands
         /// Returns whether this command will wait for user input before going to the next command.
         /// </summary>
         public bool WaitForUserInput { get { return (bool)_optionalParameters[PARAMETER_WAITFORUSERINPUT_NAME].value; } }
+        /// <summary>
+        /// Returns whether this command will produce speech sounds or not.
+        /// </summary>
+        public bool Mute { get { return (bool)_optionalParameters[PARAMETER_MUTE_NAME].value; } }
     }
 }

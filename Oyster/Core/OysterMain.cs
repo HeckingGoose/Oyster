@@ -1,4 +1,5 @@
-﻿using Oyster.Core.AbstractTypes;
+﻿using Oyster.Commands;
+using Oyster.Core.AbstractTypes;
 using Oyster.Core.AbstractTypes.Character;
 using Oyster.Core.AbstractTypes.Player;
 using Oyster.Core.AbstractTypes.Scene;
@@ -150,7 +151,13 @@ namespace Oyster.Core
 
             // Otherwise let's figure out what this command is
             // As we know it will be a valid command we can directly index and create it
-            _script[_nextCommandToLoadIndex] = _validCommands[_rawScript![_nextCommandToLoadIndex].CommandName].Invoke(_rawScript[_nextCommandToLoadIndex].Parameters);
+            ISpeechCommand? command = _validCommands[_rawScript![_nextCommandToLoadIndex].CommandName].Invoke(_rawScript[_nextCommandToLoadIndex].Parameters);
+
+            // If command fails to create then use a dummy command that takes one tick and does nothing
+            if (command == null) command = new Dum_My();
+
+            // Finally, pass command
+            _script[_nextCommandToLoadIndex] = command;
 
             // Is this command something that modifies variables? If so then we can't load more commands, as they may depend on variables existing.
             if (_script[_nextCommandToLoadIndex] is IModifiesVariables) _safeToLoadMoreCommands = false;
@@ -241,8 +248,19 @@ namespace Oyster.Core
             // Are we at the end of the conversation?
             if (_currentCommandIndex >= _script.Length)
             {
+                // Raise event
+                if (OnSpeechCompleted != null) OnSpeechCompleted();
+
                 // End the chat
                 EndChat();
+            }
+
+            // Is the current line loaded?
+            if (_script[_currentCommandIndex] == null)
+            {
+                // If not then load it and update the loader
+                _nextCommandToLoadIndex = _currentCommandIndex;
+                LoadNextCommand();
             }
 
             // Otherwise we should process the current line

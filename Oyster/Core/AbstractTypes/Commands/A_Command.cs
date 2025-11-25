@@ -27,6 +27,9 @@ namespace Oyster.Core.AbstractTypes.Commands
             // Load parameter
             destination = ReadParameter<VariableType>(rawValue);
         }
+        /// <summary>
+        /// Given a dictionary of parameters and optional parameter inputs, matches the inputs with dictionary entries and updates the dictionary to these new inputs.
+        /// </summary>
         protected static void LoadOptionalParameterValues(string[] optionalParameters, ref Dictionary<string, (object value, Type type)> destination)
         {
             // Iterate every parameter
@@ -72,6 +75,49 @@ namespace Oyster.Core.AbstractTypes.Commands
                     }
                 }
             }
+        }
+        /// <summary>
+        /// Given a string, parses it for possible RTTs.
+        /// </summary>
+        /// <param name="line">The line to parse.</param>
+        /// <param name="startPoint">The character to start on.</param>
+        /// <returns>The character at index startPoint if the character there does not suggest RTT.
+        /// A RTT tag if the character does suggest an RTT tag.
+        /// Also supports \n.</returns>
+        public static string ParseForRTT(string line, int startPoint)
+        {
+            // Create output store (we will always return at least the first character
+            string output = line.Substring(startPoint, 1);
+
+            // Is this a RTT?
+            if (line[startPoint] == Definitions.RICHTEXT_TAGSTART)
+            {
+                // Then we need to add characters until we find the end of the tag
+                for (int i = startPoint + 1; i < line.Length; i++)
+                {
+                    // Add to string
+                    output += line[i];
+
+                    // Is this the end tag?
+                    if (line[i] == Definitions.RICHTEXT_TAGEND)
+                    {
+                        // It's time to leave
+                        break;
+                    }
+                }
+            }
+
+            // Is this a \n?
+            else if (line[startPoint] == Definitions.RICHTEXT_NEWLINE_PREFACE &&
+                line.Length > startPoint + 1 && // Length check in case it's just a line that ends with '\'
+                line[startPoint + 1] == Definitions.RICHTEXT_NEWLINE_CHARACTER)
+            {
+                // Add the next character then as well
+                output += line[startPoint + 1];
+            }
+
+            // Return output
+            return output;
         }
 
         // Private Methods

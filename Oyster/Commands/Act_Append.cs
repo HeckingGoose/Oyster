@@ -9,10 +9,12 @@ namespace Oyster.Commands
         // Const
         protected const bool DEFAULT_INSTANT = false;
         protected const bool DEFAULT_WAITFORUSERINPUT = true;
+        protected const bool DEFUALT_MUTE = false;
         protected const int START_POS = 0;
 
         protected const string PARAMETER_INSTANT_NAME = "instant";
         protected const string PARAMETER_WAITFORUSERINPUT_NAME = "wait";
+        protected const string PARAMETER_MUTE_NAME = "mute";
 
 
         // Private Variables
@@ -24,13 +26,15 @@ namespace Oyster.Commands
         protected Act_Append(
             string textToDisplay,
             bool instant,
-            bool waitForUserInput
+            bool waitForUserInput,
+            bool mute
             ) : base()
         {
             // Pass in values
             _textToDisplay = textToDisplay;
             _optionalParameters.Add(PARAMETER_INSTANT_NAME, (instant, typeof(bool)));
             _optionalParameters.Add(PARAMETER_WAITFORUSERINPUT_NAME, (waitForUserInput, typeof(bool)));
+            _optionalParameters.Add(PARAMETER_MUTE_NAME, (mute, typeof(bool)));
 
             // Default
             _timer = START_POS;
@@ -59,14 +63,20 @@ namespace Oyster.Commands
             Dictionary<string, (object value, Type type)> optionals = new Dictionary<string, (object value, Type type)>
             {
                 { PARAMETER_INSTANT_NAME, (DEFAULT_INSTANT, typeof(bool)) },
-                { PARAMETER_WAITFORUSERINPUT_NAME, (DEFAULT_WAITFORUSERINPUT, typeof(bool)) }
+                { PARAMETER_WAITFORUSERINPUT_NAME, (DEFAULT_WAITFORUSERINPUT, typeof(bool)) },
+                { PARAMETER_MUTE_NAME, (DEFUALT_MUTE, typeof(bool)) }
             };
             List<string> t = [.. rawParameters];
             t.RemoveAt(0);
             LoadOptionalParameterValues(t.ToArray(), ref optionals);
 
             // Make and return self
-            return new Act_Append(textToDisplay, (bool)optionals[PARAMETER_INSTANT_NAME].value, (bool)optionals[PARAMETER_WAITFORUSERINPUT_NAME].value);
+            return new Act_Append(
+                textToDisplay,
+                (bool)optionals[PARAMETER_INSTANT_NAME].value,
+                (bool)optionals[PARAMETER_WAITFORUSERINPUT_NAME].value,
+                (bool)optionals[PARAMETER_MUTE_NAME].value
+                );
         }
         public override bool Run()
         {
@@ -90,18 +100,11 @@ namespace Oyster.Commands
                 _timer = START_POS;
 
                 // Get a character and push it
-                string toAdd = ReadIn.ParseForRTT(_textToDisplay, _currentCharacterIndex);
+                string toAdd = ParseForRTT(_textToDisplay, _currentCharacterIndex);
                 OysterMain.PlayerTalker!.SpeechDisplay.MainText.Text += toAdd;
 
                 // Increment counter by this length
                 _currentCharacterIndex += toAdd.Length;
-
-                // Play back a sound if it was a single character and we have a sounder
-                if (speechSystem.NPC.SoundPlayer != null &&
-                    toAdd.Length == 1)
-                {
-                    speechSystem.NPC.SoundPlayer.Play();
-                }
             }
 
             // Increment timer

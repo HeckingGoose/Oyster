@@ -27,6 +27,12 @@
         // Variable stuff
         internal const string VARIABLE_NOTEXISTS_FORSTRING = "???";
 
+        // Rich Text Support
+        internal const char RICHTEXT_TAGSTART = '<';
+        internal const char RICHTEXT_TAGEND = '>';
+        internal const char RICHTEXT_NEWLINE_PREFACE = '\\';
+        internal const char RICHTEXT_NEWLINE_CHARACTER = 'n';
+
         // Tickrate Definitions
         internal const int TICKRATE_PERSECOND = 80;
         internal const float TICKRATE_WAITTIME = 1f / TICKRATE_PERSECOND;

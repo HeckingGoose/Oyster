@@ -219,7 +219,7 @@ namespace Oyster.Core.AbstractTypes.Commands
         }
 
         // Public Methods
-        public abstract ISpeechCommand CreateSelf(string[] rawParameters);
+        public abstract ISpeechCommand? CreateSelf(string[] rawParameters);
         public abstract bool Run();
     }
 }

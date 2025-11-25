@@ -39,7 +39,8 @@ namespace Oyster.Core
         // Constructor
         static OysterMain()
         {
-            // Do nothing
+            // Set event
+            OnVersionGetRequest = InternalNumberAndName;
         }
 
         // Private Methods

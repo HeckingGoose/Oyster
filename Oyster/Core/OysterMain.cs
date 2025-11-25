@@ -66,6 +66,9 @@ namespace Oyster.Core
             // Call events for when Oyster is loaded
             _loaded = true;
             if (OnLoaded != null) OnLoaded();
+
+            // Tell registrar to register commands
+            Registrar.RegisterCommands();
         }
 
         // Private Methods
@@ -178,6 +181,15 @@ namespace Oyster.Core
                     // Cache raw script
                     _rawScript = RawToLines(_scriptLoader!.Asset!.Split(Definitions.OSF_VALID_LINEENDING));
 
+                    // Is this zero length?
+                    if (_rawScript.Length == 0)
+                    {
+                        // Dip out
+                        Debug.WriteLine("Zero length script loaded, cancelling conversation.");
+                        EndChat();
+                        break;
+                    }
+
                     // Now using this we can initialise an array for storing lines
                     _script = new ISpeechCommand[_rawScript.Length];
 
@@ -188,6 +200,9 @@ namespace Oyster.Core
                     // Now load our first command
                     _safeToLoadMoreCommands = true;
                     LoadNextCommand();
+
+                    // Set ourself to talking
+                    _oysterState = SpeechState.Talking;
 
                     // Invoke script loaded event
                     if (OnScriptReady != null) OnScriptReady();

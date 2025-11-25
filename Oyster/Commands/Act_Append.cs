@@ -97,7 +97,7 @@ namespace Oyster.Commands
             if (_timer > OysterMain.CharacterTalker!.Data.TimeBetweenCharacters)
             {
                 // Reset it
-                _timer = START_POS;
+                _timer -= OysterMain.CharacterTalker!.Data.TimeBetweenCharacters;
 
                 // Get a character and push it
                 string toAdd = ParseForRTT(_textToDisplay, _currentCharacterIndex);

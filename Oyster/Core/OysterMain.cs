@@ -44,11 +44,12 @@ namespace Oyster.Core
         private static A_BackgroundAssetLoader<string>? _scriptLoader;
         private static Speech_Line[]? _rawScript;
         private static Dictionary<string, CommandCreationDelegate> _validCommands;
-        // < Conversation Assets >
+        // < Conversation Objects >
         private static ISpeechCommand[] _script;
         private static int _currentCommandIndex;
         private static int _nextCommandToLoadIndex;
         private static bool _safeToLoadMoreCommands;
+        private static int _promptWaitTimer;
 
         // Constructor
         static OysterMain()
@@ -278,6 +279,24 @@ namespace Oyster.Core
                 LoadNextCommand();
             }
 
+            // Is the current line a text pusher, plus is it done
+            if ((_script[_currentCommandIndex] is ITextPusher) &&
+                !(_script[_currentCommandIndex] as ITextPusher)!.HasCharactersRemaining)
+            {
+                // Is the done counter... well... done?
+                if (_promptWaitTimer > Definitions.PROMPT_WAIT_TIME)
+                {
+                    // Show done prompt
+                    _playerScript!.SpeechDisplay.ContinuePrompt.Show();
+                }
+
+                // Otherwise we can just bump the counter
+                else _promptWaitTimer++;
+            }
+
+            // If not, then hide prompt and reset counter
+            else { _playerScript!.SpeechDisplay.ContinuePrompt.Hide(); _promptWaitTimer = 0; }
+
             // Otherwise we should process the current line
             if (_script[_currentCommandIndex].Run()) _currentCommandIndex++;
 
@@ -384,6 +403,17 @@ namespace Oyster.Core
                 // Decrement time
                 _timeSinceLastFrame -= Definitions.TICKRATE_WAITTIME;
             }
+        }
+        /// <summary>
+        /// Nudges Oyster. Imagine it like this, the user wants the conversation to continue, so the user says to Oyster "Hey, can you speed this up?", and so Oyster says, "Yeah sure!".
+        /// </summary>
+        public static void Nudge()
+        {
+            // Are we in a conversation? If not then dip.
+            if (_oysterState != SpeechState.Talking) return;
+
+            // Since we're in a conversation tell current line to go faster if it can
+            if (_script[_currentCommandIndex] is ITakesTime) (_script[_currentCommandIndex] as ITakesTime)!.MakeItGoFaster();
         }
 
         // Accessors

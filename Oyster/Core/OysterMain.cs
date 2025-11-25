@@ -18,7 +18,7 @@ namespace Oyster.Core
         }
 
         // Delegates
-        public delegate ISpeechCommand CommandCreationDelegate(string[] parameters);
+        public delegate ISpeechCommand? CommandCreationDelegate(string[] parameters);
         public delegate void PuppetCall(string command);
         public delegate void BlankDelegate();
         public delegate (string number, string name) VersionGetDelegate();
@@ -28,9 +28,11 @@ namespace Oyster.Core
         public static event BlankDelegate? OnSpeechCompleted;
         public static event BlankDelegate? OnScriptReady;
         public static event VersionGetDelegate OnVersionGetRequest;
+        public static event BlankDelegate? OnLoaded;
 
         // Private Variables
         // < General >
+        private static bool _loaded = false;
         private static SpeechState _oysterState;
         private static float _timeSinceLastFrame;
         // < Scene Objects >
@@ -59,6 +61,10 @@ namespace Oyster.Core
             // Default array values
             _script = Array.Empty<ISpeechCommand>();
             _validCommands = new Dictionary<string, CommandCreationDelegate>();
+
+            // Call events for when Oyster is loaded
+            _loaded = true;
+            if (OnLoaded != null) OnLoaded();
         }
 
         // Private Methods
@@ -348,6 +354,10 @@ namespace Oyster.Core
         }
 
         // Accessors
+        /// <summary>
+        /// Gets whether Oyster has finished initialising.
+        /// </summary>
+        public static bool Loaded { get { return _loaded; } }
         /// <summary>
         /// Gets or sets the current script that Oyster is working with.
         /// </summary>

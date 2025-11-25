@@ -316,12 +316,12 @@ namespace Oyster.Core
 
             // Begin loading the script for this conversation
             _scriptLoader = _characterScript.Data.BeginScriptLoad();
-            _scriptLoader.BeginAssetLoad();
-            Debug.WriteLine("Loading script for conversation.");
 
             // Set self to loading state
             _scriptLoader.OnLoadFinished += OnScriptLoaded;
             _oysterState = SpeechState.Loading;
+            _scriptLoader.BeginAssetLoad();
+            Debug.WriteLine("Loading script for conversation.");
             return true;
         }
         /// <summary>

@@ -238,6 +238,9 @@ namespace Oyster.Core
             _sceneScript = null;
             _rawScript = null;
 
+            // Reset script to an empty array
+            _script = Array.Empty<ISpeechCommand>();
+
             // And set state back
             _oysterState = SpeechState.NotTalking;
         }
@@ -269,6 +272,9 @@ namespace Oyster.Core
 
                 // End the chat
                 EndChat();
+
+                // Stop what's about to happen
+                return;
             }
 
             // Is the current line loaded?

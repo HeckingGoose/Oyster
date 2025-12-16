@@ -2,22 +2,22 @@
 
 namespace Oyster.Commands
 {
-    public class Set_IntVar : Set_Var<int>
+    public class Set_BoolVar : Set_Var<bool>
     {
         // Constructor
-        public Set_IntVar(string name, int value) : base(name, value) { }
+        public Set_BoolVar(string name, bool value) : base(name, value) { }
 
-        // Public Methods
+        // Public methods
         public static ISpeechCommand? MakeSelf(string[] rawParameters)
         {
             // Use base class stuff
-            (string? name, int value) = ReadParams(rawParameters);
+            (string? name, bool value) = ReadParams(rawParameters);
 
             // If name not null, then it's all good chief
             if (name == null) return null;
 
             // As it's all good just make it
-            return new Set_IntVar(name, value);
+            return new Set_BoolVar(name, value);
         }
     }
 }

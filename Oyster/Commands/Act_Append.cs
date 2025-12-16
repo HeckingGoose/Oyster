@@ -41,12 +41,6 @@ namespace Oyster.Commands
             _currentCharacterIndex = START_POS;
         }
 
-        // Explicit Interface Implementations
-        public override ISpeechCommand? CreateSelf(string[] rawParameters)
-        {
-            return MakeSelf(rawParameters);
-        }
-
         // Public Methods
         public static ISpeechCommand? MakeSelf(string[] rawParameters)
         {

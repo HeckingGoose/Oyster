@@ -1,4 +1,5 @@
-﻿using Oyster.Core.AbstractTypes.Commands;
+﻿using Oyster.Core;
+using Oyster.Core.AbstractTypes.Commands;
 
 namespace Oyster.Commands
 {
@@ -20,6 +21,10 @@ namespace Oyster.Commands
         }
 
         // Public Methods
+        /// <summary>
+        /// Reads in a given set of raw parameters as though they were the parameters for a 'Set_Var' command.
+        /// </summary>
+        /// <returns>A valid string and value on success, null and default otherwise.</returns>
         public static (string? name, VariableType? value) ReadParams(string[] rawParameters)
         {
             // Declare stores
@@ -40,6 +45,14 @@ namespace Oyster.Commands
 
             // Otherwise time to make
             return (name, value);
+        }
+        public override bool Run()
+        {
+            // Set variable value
+            Variables.SetVariableByName(_name, _value);
+
+            // And finish
+            return true;
         }
     }
 }

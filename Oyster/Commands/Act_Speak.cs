@@ -14,10 +14,6 @@ namespace Oyster.Commands
             ) : base(textToDisplay, instant, waitForUserInput, mute) { }
 
         // Explicit Interface Implementations
-        public override ISpeechCommand? CreateSelf(string[] rawParameters)
-        {
-            return MakeSelf(rawParameters);
-        }
         public static new ISpeechCommand? MakeSelf(string[] rawParameters)
         {
             // Make a thing

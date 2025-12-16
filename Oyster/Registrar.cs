@@ -14,6 +14,9 @@ namespace Oyster
             // Register all built-in commands
             OysterMain.AddCommand("act_speak", Act_Speak.MakeSelf);
             OysterMain.AddCommand("act_append", Act_Append.MakeSelf);
+            OysterMain.AddCommand("set_intvar", Set_IntVar.MakeSelf);
+            OysterMain.AddCommand("set_boolvar", Set_BoolVar.MakeSelf);
+            OysterMain.AddCommand("set_stringvar", Set_StringVar.MakeSelf);
         }
     }
 }

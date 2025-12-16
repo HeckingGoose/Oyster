@@ -13,13 +13,6 @@ namespace Oyster.Core.AbstractTypes.Commands
 
         // Protected Methods
         /// <summary>
-        /// Splits the given string into a name and a parameter value.
-        /// </summary>
-        protected static string[] SplitIntoVariableAndData(string raw)
-        {
-            return raw.Split(Definitions.PARAMETER_NAMEVALUE_SPLITTER, 2);
-        }
-        /// <summary>
         /// Loads a parameter into a given variable of matching type.
         /// </summary>
         protected static bool LoadParameterValue<VariableType>(string rawValue, ref VariableType? destination)
@@ -85,7 +78,7 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// <returns>The character at index startPoint if the character there does not suggest RTT.
         /// A RTT tag if the character does suggest an RTT tag.
         /// Also supports \n.</returns>
-        public static string ParseForRTT(string line, int startPoint)
+        protected static string ParseForRTT(string line, int startPoint)
         {
             // Create output store (we will always return at least the first character
             string output = line.Substring(startPoint, 1);
@@ -122,6 +115,13 @@ namespace Oyster.Core.AbstractTypes.Commands
         }
 
         // Private Methods
+        /// <summary>
+        /// Splits the given string into a name and a parameter value.
+        /// </summary>
+        private static string[] SplitIntoVariableAndData(string raw)
+        {
+            return raw.Split(Definitions.PARAMETER_NAMEVALUE_SPLITTER, 2);
+        }
         /// <summary>
         /// Parses a string for any variable declarations and inlines their value within the string.
         /// </summary>

@@ -22,10 +22,11 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// <summary>
         /// Loads a parameter into a given variable of matching type.
         /// </summary>
-        protected static void LoadParameterValue<VariableType>(string rawValue, ref VariableType? destination)
+        protected static bool LoadParameterValue<VariableType>(string rawValue, ref VariableType? destination)
         {
             // Load parameter
-            destination = ReadParameter<VariableType>(rawValue);
+            (destination, bool success) = ReadParameter<VariableType>(rawValue);
+            return success;
         }
         /// <summary>
         /// Given a dictionary of parameters and optional parameter inputs, matches the inputs with dictionary entries and updates the dictionary to these new inputs.
@@ -192,7 +193,7 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// <typeparam name="VariableType">The type to load the parameter as.</typeparam>
         /// <param name="rawParameterValue">A string representing the parameter value.</param>
         /// <returns>A valid value on success, default type value on any failure.</returns>
-        private static VariableType? ReadParameter<VariableType>(string rawParameterValue)
+        private static (VariableType? variable, bool success) ReadParameter<VariableType>(string rawParameterValue)
         {
             // Does the value start with a variable declaration
             if (rawParameterValue[0] == Definitions.PARAMETER_VARIABLE)
@@ -201,7 +202,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                 if (typeof(VariableType) == typeof(string) && rawParameterValue[1] == '"')
                 {
                     // Then return it using this specific method
-                    return ((VariableType)(object)LoadStringContainingVariables(rawParameterValue.Substring(2, rawParameterValue.Length - 3)))!;
+                    return (((VariableType)(object)LoadStringContainingVariables(rawParameterValue.Substring(2, rawParameterValue.Length - 3)))!, true);
                 }
 
                 // Otherwise let's just fetch the value
@@ -212,7 +213,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                 {
                     // Log issue
                     Debug.WriteLine($"Unable to load variable '{rawParameterValue.Substring(1)}', as variable does not exist!");
-                    return default;
+                    return (default, false);
                 }
 
                 // Type mismatch?
@@ -220,11 +221,11 @@ namespace Oyster.Core.AbstractTypes.Commands
                 {
                     // Log issue
                     Debug.WriteLine($"Unable to load variable '{rawParameterValue.Substring(1)}', as types do not match!");
-                    return default;
+                    return (default, false);
                 }
 
                 // We can assume it's correct so return this
-                return (VariableType)value;
+                return ((VariableType)value, true);
             }
 
             // What type is being read in here?
@@ -233,9 +234,9 @@ namespace Oyster.Core.AbstractTypes.Commands
                 // An integer
                 case Type t when t == typeof(int):
                     // Parse it, on fail return null
-                    if (int.TryParse(rawParameterValue, out int i)) return (VariableType)(object)i;
+                    if (int.TryParse(rawParameterValue, out int i)) return ((VariableType)(object)i, true);
                     Debug.WriteLine($"Unable to parse parameter value '{rawParameterValue}' as an integer!");
-                    return default;
+                    return (default, false);
 
                 // A string
                 case Type t when t == typeof(string):
@@ -245,18 +246,18 @@ namespace Oyster.Core.AbstractTypes.Commands
                     {
                         // Return null
                         Debug.WriteLine($"Parameter value '{rawParameterValue}' is not a valid string!");
-                        return default;
+                        return (default, false);
                     }
 
                     // Return trimmed string
-                    return (VariableType)(object)rawParameterValue.Substring(1, rawParameterValue.Length - 2);
+                    return ((VariableType)(object)rawParameterValue.Substring(1, rawParameterValue.Length - 2), true);
 
                 // Boolean
                 case Type t when t == typeof(bool):
                     // Parse it, on fail return null
-                    if (bool.TryParse(rawParameterValue, out bool b)) return (VariableType)(object)b;
+                    if (bool.TryParse(rawParameterValue, out bool b)) return ((VariableType)(object)b, true);
                     Debug.WriteLine($"Unable to parse parameter value '{rawParameterValue}' as a boolean!");
-                    return default;
+                    return (default, false);
             }
 
             // Invalid type given

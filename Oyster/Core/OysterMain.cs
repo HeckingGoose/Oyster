@@ -45,7 +45,8 @@ namespace Oyster.Core
         private static Speech_Line[]? _rawScript;
         private static Dictionary<string, CommandCreationDelegate> _validCommands;
         // < Conversation Objects >
-        private static ISpeechCommand[] _script;
+        private static ISpeechCommand?[] _script;
+        private static Dictionary<string, int>? _lineMarkers;
         private static int _currentCommandIndex;
         private static int _nextCommandToLoadIndex;
         private static bool _safeToLoadMoreCommands;
@@ -73,6 +74,27 @@ namespace Oyster.Core
         }
 
         // Private Methods
+        /// <summary>
+        /// Generates a dictionary containing all line markers within a given set of Speech_Lines. Is relatively expensive as it generates the entire script's commands to do this. Call sparingly.
+        /// </summary>
+        private static Dictionary<string, int> GenLineMarkers(Speech_Line[] lines)
+        {
+            // Make store
+            Dictionary<string, int> lineMarkers = new Dictionary<string, int>();
+
+            // Go through entire length of script
+            for (int i = 0; i < lines.Length; i++)
+            {
+                // Make command
+                ISpeechCommand c = LoadCommand(i, _rawScript!);
+
+                // Now check if this is a line marker, if it is we need to cache it
+                if (c is ILineMarker) lineMarkers.Add((c as ILineMarker)!.Name, i);
+            }
+
+            // And return
+            return lineMarkers;
+        }
         /// <summary>
         /// Translates raw input into a slightly neater format. Ensures that all lines are somewhat valid commands.
         /// </summary>
@@ -148,17 +170,34 @@ namespace Oyster.Core
             }
             return output.ToArray();
         }
+        /// <summary>
+        /// Loads a command from 'rawScript' at the given 'index'.
+        /// </summary>
+        private static ISpeechCommand LoadCommand(int index, Speech_Line[] rawScript)
+        {
+            // Is the next command out of range? If it is then just skip.
+            if (index >= _script.Length || index <= 0) { return new Dum_My(); }
+
+            // Otherwise let's figure out what this command is
+            // As we know it will be a valid command we can directly index and create it
+            ISpeechCommand? command = _validCommands[rawScript[index].CommandName].Invoke(rawScript[index].Parameters);
+
+            // If command fails to create then use a dummy command that takes one tick and does nothing
+            if (command == null) command = new Dum_My();
+
+            // Finally, pass command
+            return command;
+        }
+        /// <summary>
+        /// Loads the next command.
+        /// </summary>
         private static void LoadNextCommand()
         {
             // Is the next command out of range? If it is then just skip. (And mark it as unsafe to read more).
             if (_nextCommandToLoadIndex >= _script.Length) { _safeToLoadMoreCommands = false; return; }
 
-            // Otherwise let's figure out what this command is
-            // As we know it will be a valid command we can directly index and create it
-            ISpeechCommand? command = _validCommands[_rawScript![_nextCommandToLoadIndex].CommandName].Invoke(_rawScript[_nextCommandToLoadIndex].Parameters);
-
-            // If command fails to create then use a dummy command that takes one tick and does nothing
-            if (command == null) command = new Dum_My();
+            // Load command
+            ISpeechCommand? command = LoadCommand(_nextCommandToLoadIndex, _rawScript!);
 
             // Finally, pass command
             _script[_nextCommandToLoadIndex] = command;
@@ -181,6 +220,9 @@ namespace Oyster.Core
                 case A_BackgroundAssetLoader<string>.LoadResult.Succeeded:
                     // Cache raw script
                     _rawScript = RawToLines(_scriptLoader!.Asset!.Split(Definitions.OSF_VALID_LINEENDING));
+
+                    // Now cache line markers
+                    _lineMarkers = GenLineMarkers(_rawScript);
 
                     // Is this zero length?
                     if (_rawScript.Length == 0)
@@ -237,6 +279,7 @@ namespace Oyster.Core
             _characterScript = null;
             _sceneScript = null;
             _rawScript = null;
+            _lineMarkers = null;
 
             // Reset script to an empty array
             _script = Array.Empty<ISpeechCommand>();
@@ -304,7 +347,7 @@ namespace Oyster.Core
             else { _playerScript!.SpeechDisplay.ContinuePrompt.Hide(); _promptWaitTimer = 0; }
 
             // Otherwise we should process the current line
-            if (_script[_currentCommandIndex].Run()) _currentCommandIndex++;
+            if (_script[_currentCommandIndex]!.Run()) _currentCommandIndex++;
 
             // Is it safe to load more lines?
             if (_safeToLoadMoreCommands)
@@ -312,6 +355,11 @@ namespace Oyster.Core
                 // Then load another!
                 LoadNextCommand();
             }
+        }
+        private static void UnloadAllCommands()
+        {
+            // Iterate every command and then set them to null
+            for (int i = 0; i < _script.Length; i++) _script[i] = null;
         }
 
         // Public Methods

@@ -18,6 +18,7 @@ namespace Oyster
             OysterMain.AddCommand("set_boolvar", Set_BoolVar.MakeSelf);
             OysterMain.AddCommand("set_stringvar", Set_StringVar.MakeSelf);
             OysterMain.AddCommand("line_marker", Line_Marker.MakeSelf);
+            OysterMain.AddCommand("jump_to", Jump_To.MakeSelf);
         }
     }
 }

@@ -469,6 +469,25 @@ namespace Oyster.Core
             // Since we're in a conversation tell current line to go faster if it can
             if (_script[_currentCommandIndex] is ITakesTime) (_script[_currentCommandIndex] as ITakesTime)!.MakeItGoFaster();
         }
+        public static void JumpToLineMarker(string lineMarkerName)
+        {
+            // Line markers will always be a valid dictionary when called via a command.
+            // So we can skip a null check here
+
+            // Does the line marker exist?
+            if (_lineMarkers!.ContainsKey(lineMarkerName))
+            {
+                // Given it does, we should use the index to jump
+                _currentCommandIndex = _lineMarkers[lineMarkerName];
+
+                // Now we need to ensure the loader can do its job
+                // No need to move it, the update tick checks for if the command is null (which will be ensured next)
+                _safeToLoadMoreCommands = true;
+
+                // Now null out every command
+                UnloadAllCommands();
+            }
+        }
 
         // Accessors
         /// <summary>

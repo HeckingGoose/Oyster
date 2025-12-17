@@ -176,7 +176,7 @@ namespace Oyster.Core
         private static ISpeechCommand LoadCommand(int index, Speech_Line[] rawScript)
         {
             // Is the next command out of range? If it is then just skip.
-            if (index >= _script.Length || index <= 0) { return new Dum_My(); }
+            if (index >= _script.Length || index < 0) { return new Dum_My(); }
 
             // Otherwise let's figure out what this command is
             // As we know it will be a valid command we can directly index and create it

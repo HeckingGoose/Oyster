@@ -19,6 +19,9 @@ namespace Oyster.Commands
             // Make a thing
             Act_Append a = (Act_Append)Act_Append.MakeSelf(rawParameters)!;
 
+            // Dip on null
+            if (a == null) return null;
+
             // Now read its values
             return new Act_Speak(a.TextToDisplay, a.Instant, a.WaitForUserInput, a.Mute);
         }

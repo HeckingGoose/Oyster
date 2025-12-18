@@ -27,7 +27,7 @@ namespace Oyster.Core.AbstractTypes.Commands
         protected static void LoadOptionalParameterValues(string[] optionalParameters, ref Dictionary<string, (object value, Type type)> destination)
         {
             // Iterate every parameter
-            for (int i = 1; i < optionalParameters.Length; i++)
+            for (int i = 0; i < optionalParameters.Length; i++)
             {
                 // Split across the splitter
                 string[] split = SplitIntoVariableAndData(optionalParameters[i]);
@@ -42,28 +42,25 @@ namespace Oyster.Core.AbstractTypes.Commands
                     if (split[0] == kvp.Key)
                     {
                         // What type is this?
+                        bool success;
                         switch (kvp.Value.type)
                         {
                             // Boolean
                             case Type t when t == typeof(bool):
-                                destination[kvp.Key] = (ReadParameter<bool>(split[1]), kvp.Value.type);
+                                (bool bVal, success) = ReadParameter<bool>(split[1]);
+                                if (success) destination[kvp.Key] = (bVal, kvp.Value.type);
                                 break;
 
                             // Int
                             case Type t when t == typeof(int):
-                                destination[kvp.Key] = (ReadParameter<int>(split[1]), kvp.Value.type);
+                                (int iVal, success) = ReadParameter<int>(split[1]);
+                                if (success) destination[kvp.Key] = (iVal, kvp.Value.type);
                                 break;
 
                             // String
                             case Type t when t == typeof(string):
-                                // Cache value
-                                object o = kvp.Value.value!;
-
-                                // Do thing
-                                destination[kvp.Key] = (ReadParameter<string>(split[1]), kvp.Value.type)!;
-
-                                // If null then use default
-                                if (destination[kvp.Key].value == null) destination[kvp.Key] = (o, kvp.Value.type);
+                                (string? sVal, success) = ReadParameter<string>(split[1]);
+                                if (success && sVal != null) destination[kvp.Key] = (sVal, kvp.Value.type);
                                 break;
                         }
                     }
@@ -195,6 +192,8 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// <returns>A valid value on success, default type value on any failure.</returns>
         private static (VariableType? variable, bool success) ReadParameter<VariableType>(string rawParameterValue)
         {
+            // TODO: Add quiet toggle, so that during line marker and version generation, errors are not logged.
+
             // Does the value start with a variable declaration
             if (rawParameterValue[0] == Definitions.PARAMETER_VARIABLE)
             {

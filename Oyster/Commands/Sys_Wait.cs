@@ -18,12 +18,12 @@ namespace Oyster.Commands
 
         // Constructor
         public Sys_Wait(
-            int waitTime,
+            int waitTimeInMilliseconds,
             bool canSkip
             )
         {
             // Pass in values
-            _waitTime = waitTime;
+            _waitTime = (float)waitTimeInMilliseconds / MILLISECONDS_IN_A_SECOND;
             _canSkip = canSkip;
         }
 

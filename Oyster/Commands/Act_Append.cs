@@ -104,7 +104,7 @@ namespace Oyster.Commands
             // TODO: Figure out how audio should be implemented
 
             // Increment timer
-            _timer += Definitions.TICKRATE_WAITTIME;
+            _timer += Definitions.SECONDS_PER_TICK;
 
             // Return that we're not done yet
             return false;

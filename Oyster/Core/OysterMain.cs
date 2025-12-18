@@ -449,13 +449,13 @@ namespace Oyster.Core
             _timeSinceLastFrame += deltaTime;
 
             // Loop until we've caught up
-            while (_timeSinceLastFrame > Definitions.TICKRATE_WAITTIME)
+            while (_timeSinceLastFrame > Definitions.SECONDS_PER_TICK)
             {
                 // Call tick
                 Tick();
 
                 // Decrement time
-                _timeSinceLastFrame -= Definitions.TICKRATE_WAITTIME;
+                _timeSinceLastFrame -= Definitions.SECONDS_PER_TICK;
             }
         }
         /// <summary>

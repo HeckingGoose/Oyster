@@ -36,6 +36,10 @@
         internal const char RICHTEXT_NEWLINE_PREFACE = '\\';
         internal const char RICHTEXT_NEWLINE_CHARACTER = 'n';
 
+        // Script versioning
+        internal const string SCRIPTVER_DEFAULT_GAME = "Unspecified";
+        internal const string SCRIPTVER_DEFAULT_VERSION = "?.?.?";
+
         // Tickrate Definitions
         internal const int TICKS_PER_SECOND = 80;
         internal const float SECONDS_PER_TICK = 1f / TICKS_PER_SECOND;

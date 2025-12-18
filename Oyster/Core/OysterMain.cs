@@ -46,6 +46,8 @@ namespace Oyster.Core
         private static Dictionary<string, CommandCreationDelegate> _validCommands;
         // < Conversation Objects >
         private static ISpeechCommand?[] _script;
+        private static string _scriptGame = Definitions.SCRIPTVER_DEFAULT_GAME;
+        private static string _scriptVersion = Definitions.SCRIPTVER_DEFAULT_VERSION;
         private static Dictionary<string, int>? _lineMarkers;
         private static int _currentCommandIndex;
         private static int _nextCommandToLoadIndex;
@@ -94,6 +96,36 @@ namespace Oyster.Core
 
             // And return
             return lineMarkers;
+        }
+        /// <summary>
+        /// Generates two strings representing the target game and version of a given oscript. Is relatively expensive as it has to generate the entire script's commands to do this. Call sparingly.
+        /// </summary>
+        private static (string game, string version) GenScriptVersion(Speech_Line[] lines)
+        {
+            // Make stores
+            string game = Definitions.SCRIPTVER_DEFAULT_GAME;
+            string version = Definitions.SCRIPTVER_DEFAULT_VERSION;
+
+            // Go through entire length of script
+            for (int i = 0; i < lines.Length; i++)
+            {
+                // Make command
+                ISpeechCommand c = LoadCommand(i, _rawScript!);
+
+                // Now check if this is a meta tag
+                if (c is Meta)
+                {
+                    // Cache
+                    Meta m = (Meta)c;
+
+                    // Then pass value if different
+                    game = m.Game != Definitions.SCRIPTVER_DEFAULT_GAME ? m.Game : game;
+                    version = m.Version != Definitions.SCRIPTVER_DEFAULT_VERSION ? m.Version : version;
+                }
+            }
+
+            // And return
+            return (game, version);
         }
         /// <summary>
         /// Translates raw input into a slightly neater format. Ensures that all lines are somewhat valid commands.
@@ -221,9 +253,6 @@ namespace Oyster.Core
                     // Cache raw script
                     _rawScript = RawToLines(_scriptLoader!.Asset!.Split(Definitions.OSF_VALID_LINEENDING));
 
-                    // Now cache line markers
-                    _lineMarkers = GenLineMarkers(_rawScript);
-
                     // Is this zero length?
                     if (_rawScript.Length == 0)
                     {
@@ -232,6 +261,17 @@ namespace Oyster.Core
                         EndChat();
                         break;
                     }
+
+                    // Now cache line markers
+                    _lineMarkers = GenLineMarkers(_rawScript);
+
+                    // And now cache version info
+                    (_scriptGame, _scriptVersion) = GenScriptVersion(_rawScript);
+
+                    // Log potential issues
+                    (string oysterGame, string oysterVer) = GetVersionNumberAndName();
+                    if (oysterGame != _scriptGame) Debug.WriteLine($"Warning! Script game and Oyster game do not match, some script commands may not be supported (Oyster: {oysterGame}, Script: {_scriptGame})!");
+                    if (oysterVer != _scriptVersion) Debug.WriteLine($"Warning! Script version and Oyster version do not match, some script commands may either be unsupported or function differently than expected (Oyster: {oysterVer}, Script: {_scriptVersion})!");
 
                     // Now using this we can initialise an array for storing lines
                     _script = new ISpeechCommand[_rawScript.Length];

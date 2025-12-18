@@ -37,7 +37,7 @@
         internal const char RICHTEXT_NEWLINE_CHARACTER = 'n';
 
         // Tickrate Definitions
-        internal const int TICKRATE_PERSECOND = 80;
-        internal const float TICKRATE_WAITTIME = 1f / TICKRATE_PERSECOND;
+        internal const int TICKS_PER_SECOND = 80;
+        internal const float SECONDS_PER_TICK = 1f / TICKS_PER_SECOND;
     }
 }

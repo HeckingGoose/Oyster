@@ -22,7 +22,7 @@ namespace Oyster.Core
         public delegate ISpeechCommand? CommandCreationDelegate(string[] parameters);
         public delegate void PuppetCall(string command);
         public delegate void BlankDelegate();
-        public delegate (string number, string name) VersionGetDelegate();
+        public delegate (string name, string number) VersionGetDelegate();
 
         // Events
         public static event PuppetCall? OnPuppetCalled;
@@ -330,7 +330,7 @@ namespace Oyster.Core
         /// <summary>
         /// Fetches the version number and name for this build of Oyster.
         /// </summary>
-        private static (string number, string name) InternalNumberAndName() { return (Definitions.VERSION_NUMBER_STRING, Definitions.VERSION_NAME_STRING); }
+        private static (string name, string number) InternalNumberAndName() { return (Definitions.VERSION_NAME_STRING, Definitions.VERSION_NUMBER_STRING); }
         /// <summary>
         /// Runs a single tick of logic for Oyster.
         /// </summary>
@@ -455,13 +455,13 @@ namespace Oyster.Core
         /// <summary>
         /// Fetches the version number and name of this Oyster runtime. Set the 'OnVersionGetRequest' event to return custom values. This method is used for logging potential incompatibility with scripts.
         /// </summary>
-        public static (string number, string name) GetVersionNumberAndName()
+        public static (string name, string number) GetVersionNumberAndName()
         {
             // Raise event if subbed
             if (OnVersionGetRequest != null) return OnVersionGetRequest();
 
             // Otherwise use default
-            return (Definitions.VERSION_NUMBER_STRING, Definitions.VERSION_NAME_STRING);
+            return (Definitions.VERSION_NAME_STRING, Definitions.VERSION_NUMBER_STRING);
         }
         /// <summary>
         /// Lets Oyster know that this command exists for when it loads scripts.

@@ -22,6 +22,7 @@ namespace Oyster
             OysterMain.AddCommand("sys_wait", Sys_Wait.MakeSelf);
             OysterMain.AddCommand("meta", Meta.MakeSelf);
             OysterMain.AddCommand("set_colour", Set_Colour.MakeSelf);
+            OysterMain.AddCommand("set_name", Set_Name.MakeSelf);
         }
     }
 }

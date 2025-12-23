@@ -23,6 +23,7 @@ namespace Oyster
             OysterMain.AddCommand("meta", Meta.MakeSelf);
             OysterMain.AddCommand("set_colour", Set_Colour.MakeSelf);
             OysterMain.AddCommand("set_name", Set_Name.MakeSelf);
+            OysterMain.AddCommand("set_script", Set_Script.MakeSelf);
         }
     }
 }

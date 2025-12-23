@@ -24,6 +24,11 @@ namespace Oyster.Core.AbstractTypes.Character
         /// </summary>
         /// <returns>An asset loader that will in the future contain the loaded asset.</returns>
         public abstract A_BackgroundAssetLoader<string> BeginScriptLoad();
+        /// <summary>
+        /// Sets which script this character should use.
+        /// </summary>
+        /// <param name="scriptName">The name of the script to use.</param>
+        public abstract void SetScript(string scriptName);
 
         // Accessors
         /// <summary>

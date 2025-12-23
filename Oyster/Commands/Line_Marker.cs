@@ -18,6 +18,9 @@ namespace Oyster.Commands
         // Public Methods
         public static ISpeechCommand? MakeSelf(string[] rawParameters)
         {
+            // Length check
+            if (rawParameters.Length < 1) return null;
+
             // Read in first param as string
             string? name = null;
             bool success = LoadParameterValue(rawParameters[0], ref name);

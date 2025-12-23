@@ -44,6 +44,9 @@ namespace Oyster.Commands
         // Public Methods
         public static ISpeechCommand? MakeSelf(string[] rawParameters)
         {
+            // Length check
+            if (rawParameters.Length < 1) return null;
+
             // Declare stores
             string? textToDisplay = string.Empty;
 

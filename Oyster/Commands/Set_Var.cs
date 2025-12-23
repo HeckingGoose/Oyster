@@ -27,6 +27,9 @@ namespace Oyster.Commands
         /// <returns>A valid string and value on success, null and default otherwise.</returns>
         public static (string? name, VariableType? value) ReadParams(string[] rawParameters)
         {
+            // Length check
+            if (rawParameters.Length < 2) return (null, default);
+
             // Declare stores
             string? name = string.Empty;
             VariableType? value = default;

@@ -8,14 +8,21 @@ namespace Oyster.Core.AbstractTypes.Character
         protected string _displayName;
         protected Color _displayNameColour;
         protected float _timeBetweenCharacters;
+        protected A_CharacterSprite _spriteManager;
 
         // Constructor
-        public A_CharacterData(string name, Color nameColour, float timeBetweenCharacters)
+        public A_CharacterData(
+            string name,
+            Color nameColour,
+            float timeBetweenCharacters,
+            A_CharacterSprite spriteManager
+            )
         {
             // Pass Values
             _displayName = name;
             _displayNameColour = nameColour;
             _timeBetweenCharacters = timeBetweenCharacters;
+            _spriteManager = spriteManager;
         }
 
         // Public Methods
@@ -43,5 +50,9 @@ namespace Oyster.Core.AbstractTypes.Character
         /// Gets the time that should occur between each character being pushed to the display for this character.
         /// </summary>
         public float TimeBetweenCharacters { get { return _timeBetweenCharacters; } }
+        /// <summary>
+        /// Gets the sprite manager for this character.
+        /// </summary>
+        public A_CharacterSprite SpriteManager { get { return _spriteManager; } }
     }
 }

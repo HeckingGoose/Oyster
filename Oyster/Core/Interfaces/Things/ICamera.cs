@@ -2,6 +2,10 @@
 {
     public interface ICamera
     {
+        // Public Methods
+        public void SetDefaultLookTarget(string targetName);
+        public void ResetLookTarget();
+
         // Accessors
         /// <summary>
         /// Gets or sets the field of view for this camera in integer degrees.
@@ -11,5 +15,9 @@
         /// Gets or sets the name of the object that the camera should look at during conversation.
         /// </summary>
         public string LookTargetName { get; set; }
+        /// <summary>
+        /// Gets the name of the default look target for this camera.
+        /// </summary>
+        public string BaseLookTarget { get; }
     }
 }

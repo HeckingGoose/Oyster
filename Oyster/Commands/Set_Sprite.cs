@@ -35,7 +35,7 @@ namespace Oyster.Commands
         public override bool Run()
         {
             // Direct set sprite via name
-            OysterMain.CharacterTalker!.Data.SpriteManager.SetSprite(_name);
+            OysterMain.CharacterTalker!.SpriteManager.SetSprite(_name);
 
             // Return true
             return true;

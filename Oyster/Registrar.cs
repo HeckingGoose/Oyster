@@ -25,6 +25,7 @@ namespace Oyster
             OysterMain.AddCommand("set_name", Set_Name.MakeSelf);
             OysterMain.AddCommand("set_script", Set_Script.MakeSelf);
             OysterMain.AddCommand("set_sprite", Set_Sprite.MakeSelf);
+            OysterMain.AddCommand("set_looker", Set_Looker.MakeSelf);
         }
     }
 }

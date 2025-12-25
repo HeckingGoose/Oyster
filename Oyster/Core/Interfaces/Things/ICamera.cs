@@ -1,4 +1,4 @@
-﻿namespace Oyster.Core.Interfaces.EngineImplementation
+﻿namespace Oyster.Core.Interfaces.Things
 {
     public interface ICamera
     {

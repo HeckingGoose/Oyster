@@ -27,6 +27,7 @@ namespace Oyster
             OysterMain.AddCommand("set_sprite", Set_Sprite.MakeSelf);
             OysterMain.AddCommand("set_looker", Set_Looker.MakeSelf);
             OysterMain.AddCommand("set_fov", Set_FOV.MakeSelf);
+            OysterMain.AddCommand("call_puppet", Call_Puppet.MakeSelf);
         }
     }
 }

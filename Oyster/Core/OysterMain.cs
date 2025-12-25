@@ -509,6 +509,10 @@ namespace Oyster.Core
             // Since we're in a conversation tell current line to go faster if it can
             if (_script[_currentCommandIndex] is ITakesTime) (_script[_currentCommandIndex] as ITakesTime)!.MakeItGoFaster();
         }
+        /// <summary>
+        /// Given anything is subbed to OnPuppetCalled, invokes it with the given command name.
+        /// </summary>
+        public static void CallPuppet(string command) { if (OnPuppetCalled != null) OnPuppetCalled(command); }
         public static void JumpToLineMarker(string lineMarkerName)
         {
             // Line markers will always be a valid dictionary when called via a command.

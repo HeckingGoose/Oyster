@@ -1,6 +1,6 @@
 ﻿using Oyster.Core.AbstractTypes.Character;
 using Oyster.Core.AbstractTypes.Player;
-using Oyster.Core.Interfaces.EngineImplementation;
+using Oyster.Core.Interfaces.Things;
 
 namespace Oyster.Core.AbstractTypes.Scene
 {

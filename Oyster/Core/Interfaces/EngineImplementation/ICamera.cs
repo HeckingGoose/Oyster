@@ -4,9 +4,9 @@
     {
         // Accessors
         /// <summary>
-        /// Gets or sets the field of view for this camera.
+        /// Gets or sets the field of view for this camera in integer degrees.
         /// </summary>
-        public float FOV { get; set; }
+        public int FOV { get; set; }
         /// <summary>
         /// Gets or sets the name of the object that the camera should look at during conversation.
         /// </summary>

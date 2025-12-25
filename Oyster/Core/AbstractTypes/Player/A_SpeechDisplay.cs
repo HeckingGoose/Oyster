@@ -1,4 +1,4 @@
-﻿using Oyster.Core.Interfaces.EngineImplementation;
+﻿using Oyster.Core.Interfaces.Things;
 using System.Drawing;
 
 namespace Oyster.Core.AbstractTypes.Player

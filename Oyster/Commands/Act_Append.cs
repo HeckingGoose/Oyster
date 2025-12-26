@@ -7,15 +7,15 @@ namespace Oyster.Commands
     public class Act_Append : A_Command, ITakesTime, ITextPusher
     {
         // Const
-        protected const bool DEFAULT_INSTANT = false;
-        protected const bool DEFAULT_WAITFORUSERINPUT = true;
-        protected const bool DEFUALT_MUTE = false;
+        public const bool DEFAULT_INSTANT = false;
+        public const bool DEFAULT_WAITFORUSERINPUT = true;
+        public const bool DEFUALT_MUTE = false;
+
+        public const string PARAMETER_INSTANT_NAME = "instant";
+        public const string PARAMETER_WAITFORUSERINPUT_NAME = "wait";
+        public const string PARAMETER_MUTE_NAME = "mute";
+
         protected const int START_POS = 0;
-
-        protected const string PARAMETER_INSTANT_NAME = "instant";
-        protected const string PARAMETER_WAITFORUSERINPUT_NAME = "wait";
-        protected const string PARAMETER_MUTE_NAME = "mute";
-
 
         // Private Variables
         protected string _textToDisplay;

@@ -6,6 +6,9 @@ namespace Oyster.Commands
 {
     public class Set_Looker : A_Command
     {
+        // Const
+        public const string DEFAULT_TARGET = "default";
+
         // Private Variables
         private string _name;
 
@@ -34,6 +37,14 @@ namespace Oyster.Commands
         }
         public override bool Run()
         {
+            // Check for default
+            if (_name == DEFAULT_TARGET)
+            {
+                // If so, set default and dip
+                OysterMain.PlayerTalker!.Camera.ResetLookTarget();
+                return true;
+            }
+
             // Direct set
             OysterMain.PlayerTalker!.Camera.LookTargetName = _name;
 

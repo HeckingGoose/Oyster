@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using Oyster.Core.Types;
 
 namespace Oyster.Core.Interfaces.Things
 {
@@ -18,6 +18,6 @@ namespace Oyster.Core.Interfaces.Things
         /// <summary>
         /// Gets or sets the colour of this text field.
         /// </summary>
-        public Color TextColour { get; set; }
+        public Colour TextColour { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using Oyster.Core.Types;
 
 namespace Oyster.Core.AbstractTypes.Character
 {
@@ -6,13 +6,13 @@ namespace Oyster.Core.AbstractTypes.Character
     {
         // Protected Variables
         protected string _displayName;
-        protected Color _displayNameColour;
+        protected Colour _displayNameColour;
         protected float _timeBetweenCharacters;
 
         // Constructor
         public A_CharacterData(
             string name,
-            Color nameColour,
+            Colour nameColour,
             float timeBetweenCharacters
             )
         {
@@ -42,7 +42,7 @@ namespace Oyster.Core.AbstractTypes.Character
         /// <summary>
         /// Gets the colour that this character's name should be drawn as.
         /// </summary>
-        public Color DisplayNameColour { get { return _displayNameColour; } }
+        public Colour DisplayNameColour { get { return _displayNameColour; } }
         /// <summary>
         /// Gets the time that should occur between each character being pushed to the display for this character.
         /// </summary>

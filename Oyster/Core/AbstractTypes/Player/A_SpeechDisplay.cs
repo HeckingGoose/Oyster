@@ -1,5 +1,5 @@
 ﻿using Oyster.Core.Interfaces.Things;
-using System.Drawing;
+using Oyster.Core.Types;
 
 namespace Oyster.Core.AbstractTypes.Player
 {
@@ -38,7 +38,7 @@ namespace Oyster.Core.AbstractTypes.Player
         /// </summary>
         /// <param name="nameText">The text to reset the 'name' text field to.</param>
         /// <param name="nameColour">The colour to reset the 'name' text field to.</param>
-        public void ResetDisplay(string nameText, Color nameColour)
+        public void ResetDisplay(string nameText, Colour nameColour)
         {
             // Pass Values
             _nameText.Text = nameText;
@@ -51,11 +51,11 @@ namespace Oyster.Core.AbstractTypes.Player
         /// Resets this speech display to a mostly default state.
         /// </summary>
         /// <param name="nameColour">The colour to reset the 'name' text field to.</param>
-        public void ResetDisplay(Color nameColour) { ResetDisplay(DEFAULT_DISPLAYNAME, nameColour); }
+        public void ResetDisplay(Colour nameColour) { ResetDisplay(DEFAULT_DISPLAYNAME, nameColour); }
         /// <summary>
         /// Resets this speech display to a mostly default state.
         /// </summary>
-        public void ResetDisplay() { ResetDisplay(Color.Red); }
+        public void ResetDisplay() { ResetDisplay(Colour.Red); }
 
         public void Show()
         {

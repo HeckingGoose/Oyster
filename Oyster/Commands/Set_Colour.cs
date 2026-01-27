@@ -1,14 +1,14 @@
 ﻿using Oyster.Core;
 using Oyster.Core.AbstractTypes.Commands;
 using Oyster.Core.Interfaces.Commands;
-using System.Drawing;
+using Oyster.Core.Types;
 
 namespace Oyster.Commands
 {
     public class Set_Colour : A_Command
     {
         // Private Variables
-        private Color _colour;
+        private Colour _colour;
 
         // Constructor
         public Set_Colour(
@@ -19,7 +19,7 @@ namespace Oyster.Commands
             )
         {
             // Make Colour
-            _colour = Color.FromArgb(a, r, g, b);
+            _colour = new Colour((byte)r, (byte)g, (byte)b, (byte)a);
         }
 
         // Public Methods

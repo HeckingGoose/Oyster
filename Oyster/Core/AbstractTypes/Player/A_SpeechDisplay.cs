@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Oyster.Core.AbstractTypes.Player
 {
-    public class A_SpeechDisplay : IShowAndHide
+    public abstract class A_SpeechDisplay : IShowAndHide
     {
         // Const
         protected const string DEFAULT_DISPLAYNAME = "default";

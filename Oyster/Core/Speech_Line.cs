@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Oyster.Core
 {
     public class Speech_Line

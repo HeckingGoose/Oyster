@@ -4,6 +4,8 @@ using Oyster.Core.AbstractTypes.Character;
 using Oyster.Core.AbstractTypes.Player;
 using Oyster.Core.AbstractTypes.Scene;
 using Oyster.Core.Interfaces.Commands;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Oyster.Core

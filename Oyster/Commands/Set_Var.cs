@@ -25,14 +25,14 @@ namespace Oyster.Commands
         /// Reads in a given set of raw parameters as though they were the parameters for a 'Set_Var' command.
         /// </summary>
         /// <returns>A valid string and value on success, null and default otherwise.</returns>
-        public static (string? name, VariableType? value) ReadParams(string[] rawParameters)
+        public static (string? name, VariableType value) ReadParams(string[] rawParameters)
         {
             // Length check
             if (rawParameters.Length < 2) return (null, default);
 
             // Declare stores
             string? name = string.Empty;
-            VariableType? value = default;
+            VariableType value = default;
 
             // Read in first value as string
             LoadParameterValue(rawParameters[0], ref name);

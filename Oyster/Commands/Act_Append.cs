@@ -1,6 +1,9 @@
 ﻿using Oyster.Core;
 using Oyster.Core.AbstractTypes.Commands;
 using Oyster.Core.Interfaces.Commands;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Oyster.Commands
 {
@@ -63,7 +66,7 @@ namespace Oyster.Commands
                 { PARAMETER_WAITFORUSERINPUT_NAME, (DEFAULT_WAITFORUSERINPUT, typeof(bool)) },
                 { PARAMETER_MUTE_NAME, (DEFUALT_MUTE, typeof(bool)) }
             };
-            List<string> t = [.. rawParameters];
+            List<string> t = rawParameters.ToList();
             t.RemoveAt(0);
             LoadOptionalParameterValues(t.ToArray(), ref optionals);
 

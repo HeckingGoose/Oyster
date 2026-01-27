@@ -1,6 +1,6 @@
 ﻿namespace Oyster.Core.AbstractTypes
 {
-    public abstract class A_BackgroundAssetLoader<AssetType>
+    public abstract class A_BackgroundAssetLoader<AssetType> where AssetType : class
     {
         // Const
         protected const string DEFAULT_LOG = "No message supplied.";

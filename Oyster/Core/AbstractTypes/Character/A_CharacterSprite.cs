@@ -1,15 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Oyster.Core.AbstractTypes.Character
 {
     public abstract class A_CharacterSprite
     {
         // Protected Variables
-        protected List<A_Sprite> _sprites;
+        protected A_Sprite[] _sprites;
 
         // Constructor
-        public A_CharacterSprite(A_Sprite[] sprites) : this(sprites.ToList()) { }
-        public A_CharacterSprite(List<A_Sprite> sprites) { _sprites = sprites; }
+        public A_CharacterSprite(List<A_Sprite> sprites) : this(sprites.ToArray()) { }
+        public A_CharacterSprite(A_Sprite[] sprites) { _sprites = sprites; }
 
         // Protected Methods
         /// <summary>

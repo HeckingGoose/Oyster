@@ -1,4 +1,6 @@
 ﻿using Oyster.Core.Interfaces.Commands;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Oyster.Core.AbstractTypes.Commands
@@ -15,10 +17,11 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// <summary>
         /// Loads a parameter into a given variable of matching type.
         /// </summary>
-        protected static bool LoadParameterValue<VariableType>(string rawValue, ref VariableType? destination)
+        protected static bool LoadParameterValue<VariableType>(string rawValue, ref VariableType destination)
         {
             // Load parameter
-            (destination, bool success) = ReadParameter<VariableType>(rawValue);
+            bool success;
+            (destination, success) = ReadParameter<VariableType>(rawValue);
             return success;
         }
         /// <summary>
@@ -47,19 +50,22 @@ namespace Oyster.Core.AbstractTypes.Commands
                         {
                             // Boolean
                             case Type t when t == typeof(bool):
-                                (bool bVal, success) = ReadParameter<bool>(split[1]);
+                                bool bVal;
+                                (bVal, success) = ReadParameter<bool>(split[1]);
                                 if (success) destination[kvp.Key] = (bVal, kvp.Value.type);
                                 break;
 
                             // Int
                             case Type t when t == typeof(int):
-                                (int iVal, success) = ReadParameter<int>(split[1]);
+                                int iVal;
+                                (iVal, success) = ReadParameter<int>(split[1]);
                                 if (success) destination[kvp.Key] = (iVal, kvp.Value.type);
                                 break;
 
                             // String
                             case Type t when t == typeof(string):
-                                (string? sVal, success) = ReadParameter<string>(split[1]);
+                                string? sVal;
+                                (sVal, success) = ReadParameter<string>(split[1]);
                                 if (success && sVal != null) destination[kvp.Key] = (sVal, kvp.Value.type);
                                 break;
                         }
@@ -190,7 +196,7 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// <typeparam name="VariableType">The type to load the parameter as.</typeparam>
         /// <param name="rawParameterValue">A string representing the parameter value.</param>
         /// <returns>A valid value on success, default type value on any failure.</returns>
-        private static (VariableType? variable, bool success) ReadParameter<VariableType>(string rawParameterValue)
+        private static (VariableType variable, bool success) ReadParameter<VariableType>(string rawParameterValue)
         {
             // TODO: Add quiet toggle, so that during line marker and version generation, errors are not logged.
 

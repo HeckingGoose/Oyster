@@ -1,4 +1,7 @@
-﻿namespace Oyster.Core
+﻿using System;
+using System.Collections.Generic;
+
+namespace Oyster.Core
 {
     public static class Variables
     {

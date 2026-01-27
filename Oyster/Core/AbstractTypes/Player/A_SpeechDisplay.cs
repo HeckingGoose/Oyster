@@ -30,6 +30,9 @@ namespace Oyster.Core.AbstractTypes.Player
             _nameTextBacking = nameTextBacking;
             _mainTextBacking = mainTextBacking;
             _continuePrompt = continuePrompt;
+
+            // Hide on start
+            Hide();
         }
 
         // Public Methods

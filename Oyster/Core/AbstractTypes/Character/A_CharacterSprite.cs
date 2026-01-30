@@ -37,7 +37,7 @@ namespace Oyster.Core.AbstractTypes.Character
                 if (sprite.Name.ToLower() == name)
                 {
                     // Then set and exit
-                    OnSpriteSet(sprite.Sprite);
+                    OnSpriteSet(sprite);
                     return true;
                 }
             }

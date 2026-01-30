@@ -16,8 +16,8 @@ namespace Oyster.Core.AbstractTypes.Character
         /// <summary>
         /// Called when the sprite of this character is requested to be changed.
         /// </summary>
-        /// <param name="sprite">An object likely to be the sprite to change to.</param>
-        protected abstract void OnSpriteSet(object sprite);
+        /// <param name="sprite">The sprite to change to.</param>
+        protected abstract void OnSpriteSet(A_Sprite sprite);
 
         // Public Methods
         /// <summary>

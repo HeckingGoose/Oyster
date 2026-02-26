@@ -6,7 +6,6 @@ using Oyster.Core.AbstractTypes.Scene;
 using Oyster.Core.Interfaces.Commands;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Oyster.Core
 {
@@ -90,7 +89,7 @@ namespace Oyster.Core
             for (int i = 0; i < lines.Length; i++)
             {
                 // Make command
-                ISpeechCommand c = LoadCommand(i, _rawScript!);
+                ISpeechCommand c = LoadCommand(i, lines!);
 
                 // Now check if this is a line marker, if it is we need to cache it
                 if (c is ILineMarker) lineMarkers.Add((c as ILineMarker)!.Name, i);
@@ -112,13 +111,16 @@ namespace Oyster.Core
             for (int i = 0; i < lines.Length; i++)
             {
                 // Make command
-                ISpeechCommand c = LoadCommand(i, _rawScript!);
+                ISpeechCommand c = LoadCommand(i, lines!);
 
-                // Now check if this is a meta tag
+                // Safety first
                 if (c is Meta)
                 {
                     // Cache
                     Meta m = (Meta)c;
+
+                    // Just in case though
+                    if (m == null) continue;
 
                     // Then pass value if different
                     game = m.Game != Definitions.SCRIPTVER_DEFAULT_GAME ? m.Game : game;
@@ -130,12 +132,13 @@ namespace Oyster.Core
             return (game, version);
         }
         /// <summary>
-        /// Translates raw input into a slightly neater format. Ensures that all lines are somewhat valid commands.
+        /// Translates raw input into a slightly neater format. Ensures that all lines are somewhat valid commands. Also splits out meta tags.
         /// </summary>
-        private static Speech_Line[] RawToLines(string[] rawLines)
+        private static (Speech_Line[] mainScript, Speech_Line[] metaTags) RawToLines(string[] rawLines)
         {
             // Create store (not matching input size due to some lines maybe needing to be ignored).
-            List<Speech_Line> output = new List<Speech_Line>();
+            List<Speech_Line> mainScript = new List<Speech_Line>();
+            List<Speech_Line> metaTags = new List<Speech_Line>();
 
             // Iterate through every line
             foreach (string line in rawLines)
@@ -190,19 +193,33 @@ namespace Oyster.Core
                 if (command == string.Empty)
                 {
                     // If not then skip this line
-                    Debug.WriteLine($"Unknown command '{split[0]}' found during linting!");
+                    DebugOut.Warn($"Unknown command '{split[0]}' found during linting!");
                     continue;
                 }
 
-                // Make a new line from these
-                output.Add(
-                    new Speech_Line(
-                        command,
-                        split[1]
-                        )
-                    );
+                // Is it a meta command
+                if (command == Definitions.COMMAND_META_NAME)
+                {
+                    // Cache meta command
+                    metaTags.Add(
+                        new Speech_Line(
+                            command,
+                            split[1]
+                            )
+                        );
+                }
+                else
+                {
+                    // Make a new line from these
+                    mainScript.Add(
+                        new Speech_Line(
+                            command,
+                            split[1]
+                            )
+                        );
+                }
             }
-            return output.ToArray();
+            return (mainScript.ToArray(), metaTags.ToArray());
         }
         /// <summary>
         /// Loads a command from 'rawScript' at the given 'index'.
@@ -228,7 +245,12 @@ namespace Oyster.Core
         private static void LoadNextCommand()
         {
             // Is the next command out of range? If it is then just skip. (And mark it as unsafe to read more).
-            if (_nextCommandToLoadIndex >= _script.Length) { _safeToLoadMoreCommands = false; return; }
+            if (_nextCommandToLoadIndex >= _script.Length)
+            {
+                DebugOut.Log("Reached end of script. No more commands to load.");
+                _safeToLoadMoreCommands = false;
+                return;
+            }
 
             // Load command
             ISpeechCommand? command = LoadCommand(_nextCommandToLoadIndex, _rawScript!);
@@ -252,14 +274,15 @@ namespace Oyster.Core
             {
                 // Yes
                 case A_BackgroundAssetLoader<string>.LoadResult.Succeeded:
-                    // Cache raw script
-                    _rawScript = RawToLines(_scriptLoader!.Asset!.Split(Definitions.OSF_VALID_LINEENDING));
+                    // Cache raw script and meta tags
+                    Speech_Line[] metaTags;
+                    (_rawScript, metaTags) = RawToLines(_scriptLoader!.Asset!.Split(Definitions.OSF_VALID_LINEENDING));
 
                     // Is this zero length?
                     if (_rawScript.Length == 0)
                     {
                         // Dip out
-                        Debug.WriteLine("Zero length script loaded, cancelling conversation.");
+                        DebugOut.Error("Zero length script loaded, cancelling conversation.");
                         EndChat();
                         break;
                     }
@@ -268,12 +291,13 @@ namespace Oyster.Core
                     _lineMarkers = GenLineMarkers(_rawScript);
 
                     // And now cache version info
-                    (_scriptGame, _scriptVersion) = GenScriptVersion(_rawScript);
+                    (_scriptGame, _scriptVersion) = GenScriptVersion(metaTags);
 
                     // Log potential issues
+                    // TODO: Meta no loady
                     (string oysterGame, string oysterVer) = GetVersionNumberAndName();
-                    if (oysterGame != _scriptGame) Debug.WriteLine($"Warning! Script game and Oyster game do not match, some script commands may not be supported (Oyster: {oysterGame}, Script: {_scriptGame})!");
-                    if (oysterVer != _scriptVersion) Debug.WriteLine($"Warning! Script version and Oyster version do not match, some script commands may either be unsupported or function differently than expected (Oyster: {oysterVer}, Script: {_scriptVersion})!");
+                    if (oysterGame != _scriptGame) DebugOut.Warn($"Warning! Script game and Oyster game do not match, some script commands may not be supported (Oyster: {oysterGame}, Script: {_scriptGame})!");
+                    if (oysterVer != _scriptVersion) DebugOut.Warn($"Warning! Script version and Oyster version do not match, some script commands may either be unsupported or function differently than expected (Oyster: {oysterVer}, Script: {_scriptVersion})!");
 
                     // Now using this we can initialise an array for storing lines
                     _script = new ISpeechCommand[_rawScript.Length];
@@ -297,7 +321,7 @@ namespace Oyster.Core
                 case A_BackgroundAssetLoader<string>.LoadResult.Failed:
                 default:
                     // Then log issue and end conversation
-                    Debug.WriteLine(log);
+                    DebugOut.Error(log);
                     EndChat();
                     break;
             }
@@ -310,6 +334,8 @@ namespace Oyster.Core
         /// </summary>
         private static void EndChat()
         {
+            DebugOut.Log("Cleaning up conversation and quitting...");
+
             // Tell the player's speech display to hide itself
             if (_playerScript != null) _playerScript.SpeechDisplay.Hide();
 
@@ -328,6 +354,8 @@ namespace Oyster.Core
 
             // And set state back
             _oysterState = SpeechState.NotTalking;
+
+            DebugOut.Log("Done cleaning!");
         }
         /// <summary>
         /// Fetches the version number and name for this build of Oyster.
@@ -362,7 +390,7 @@ namespace Oyster.Core
                 return;
             }
 
-            // Is the current line loaded?
+            // Is the current line not loaded?
             if (_script[_currentCommandIndex] == null)
             {
                 // If not then load it and update the loader
@@ -378,7 +406,7 @@ namespace Oyster.Core
                 if (_promptWaitTimer > Definitions.PROMPT_WAIT_TIME)
                 {
                     // Show done prompt
-                    _playerScript!.SpeechDisplay.ContinuePrompt.Show();
+                    if (_playerScript!.SpeechDisplay.ContinuePrompt != null) _playerScript.SpeechDisplay.ContinuePrompt.Show();
                 }
 
                 // Otherwise we can just bump the counter
@@ -386,10 +414,14 @@ namespace Oyster.Core
             }
 
             // If not, then hide prompt and reset counter
-            else { _playerScript!.SpeechDisplay.ContinuePrompt.Hide(); _promptWaitTimer = 0; }
+            else { if (_playerScript!.SpeechDisplay.ContinuePrompt != null) _playerScript.SpeechDisplay.ContinuePrompt.Hide(); _promptWaitTimer = 0; }
 
             // Otherwise we should process the current line
-            if (_script[_currentCommandIndex]!.Run()) _currentCommandIndex++;
+            if (_script[_currentCommandIndex]!.Run())
+            {
+                _currentCommandIndex++;
+                DebugOut.Log($"Running {_script[_currentCommandIndex]!.ToString()}");
+            }
 
             // Is it safe to load more lines?
             if (_safeToLoadMoreCommands)
@@ -419,13 +451,13 @@ namespace Oyster.Core
             )
         {
             // Ensure these are actual things
-            if (sceneScript == null || playerTalker == null || characterTalker == null) { Debug.WriteLine("At least one parameter to StartChat() was null."); return false; }
+            if (sceneScript == null || playerTalker == null || characterTalker == null) { DebugOut.Error("At least one parameter to StartChat() was null."); return false; }
 
             // Pass these values across for later use
             _sceneScript = sceneScript;
             _playerScript = playerTalker;
             _characterScript = characterTalker;
-            Debug.WriteLine("Cached all relevant scripts for conversation.");
+            DebugOut.Log("Cached all relevant scripts for conversation.");
 
             // TODO: Figure out how to implement the 'lookers'
 
@@ -438,11 +470,11 @@ namespace Oyster.Core
             // And now we should update the display using the character info
             _playerScript.SpeechDisplay.NameText.Text = _characterScript.Data.DisplayName;
             _playerScript.SpeechDisplay.NameText.TextColour = _characterScript.Data.DisplayNameColour;
-            Debug.WriteLine("Finished prepping speech display.");
+            DebugOut.Log("Finished prepping speech display.");
 
             // Now let's show the speech box since it's all set-up
             _playerScript.SpeechDisplay.Show();
-            Debug.WriteLine("Told the player to show their speech display.");
+            DebugOut.Log("Told the player to show their speech display.");
 
             // Begin loading the script for this conversation
             _scriptLoader = _characterScript.Data.BeginScriptLoad();
@@ -451,7 +483,7 @@ namespace Oyster.Core
             _scriptLoader.OnLoadFinished += OnScriptLoaded;
             _oysterState = SpeechState.Loading;
             _scriptLoader.BeginAssetLoad();
-            Debug.WriteLine("Loading script for conversation.");
+            DebugOut.Log("Loading script for conversation.");
             return true;
         }
         /// <summary>
@@ -552,5 +584,9 @@ namespace Oyster.Core
         /// Gets or sets Oyster's reference to the character's speech script.
         /// </summary>
         public static A_CharacterTalker? CharacterTalker { get { return _characterScript; } set { _characterScript = value; } }
+        /// <summary>
+        /// Gets the current state of Oyster. Can either be 'not talking', 'talking' or 'loading'.
+        /// </summary>
+        public static SpeechState CurrentState { get { return _oysterState; } }
     }
 }

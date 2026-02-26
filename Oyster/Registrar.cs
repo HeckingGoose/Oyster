@@ -20,7 +20,7 @@ namespace Oyster
             OysterMain.AddCommand("line_marker", Line_Marker.MakeSelf);
             OysterMain.AddCommand("jump_to", Jump_To.MakeSelf);
             OysterMain.AddCommand("sys_wait", Sys_Wait.MakeSelf);
-            OysterMain.AddCommand("meta", Meta.MakeSelf);
+            OysterMain.AddCommand(Definitions.COMMAND_META_NAME, Meta.MakeSelf);
             OysterMain.AddCommand("set_colour", Set_Colour.MakeSelf);
             OysterMain.AddCommand("set_name", Set_Name.MakeSelf);
             OysterMain.AddCommand("set_script", Set_Script.MakeSelf);

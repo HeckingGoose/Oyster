@@ -5,6 +5,7 @@
         // Metadata Definitions
         internal const string VERSION_NUMBER_STRING = "4.1.0";
         internal const string VERSION_NAME_STRING = "Base";
+        internal const string COMMAND_META_NAME = "meta";
 
         // OSF File Definitions
         internal const char OSF_VALID_LINEENDING = '\n';

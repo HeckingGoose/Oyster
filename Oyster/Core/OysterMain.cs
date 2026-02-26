@@ -294,7 +294,6 @@ namespace Oyster.Core
                     (_scriptGame, _scriptVersion) = GenScriptVersion(metaTags);
 
                     // Log potential issues
-                    // TODO: Meta no loady
                     (string oysterGame, string oysterVer) = GetVersionNumberAndName();
                     if (oysterGame != _scriptGame) DebugOut.Warn($"Warning! Script game and Oyster game do not match, some script commands may not be supported (Oyster: {oysterGame}, Script: {_scriptGame})!");
                     if (oysterVer != _scriptVersion) DebugOut.Warn($"Warning! Script version and Oyster version do not match, some script commands may either be unsupported or function differently than expected (Oyster: {oysterVer}, Script: {_scriptVersion})!");

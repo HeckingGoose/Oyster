@@ -1,7 +1,6 @@
 ﻿using Oyster.Core.Interfaces.Commands;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Oyster.Core.AbstractTypes.Commands
 {
@@ -29,6 +28,11 @@ namespace Oyster.Core.AbstractTypes.Commands
         /// </summary>
         protected static void LoadOptionalParameterValues(string[] optionalParameters, ref Dictionary<string, (object value, Type type)> destination)
         {
+            // Cache keys
+            string?[] keys = new string[destination.Keys.Count];
+            int k = 0;
+            foreach (var key in destination.Keys) { keys[k] = key; k++; }
+
             // Iterate every parameter
             for (int i = 0; i < optionalParameters.Length; i++)
             {
@@ -36,37 +40,40 @@ namespace Oyster.Core.AbstractTypes.Commands
                 string[] split = SplitIntoVariableAndData(optionalParameters[i]);
 
                 // Iterate every value in the dictionary
-                foreach (KeyValuePair<string, (object value, Type type)> kvp in destination)
+                foreach (string? key in keys)
                 {
+                    // Ensure key not null
+                    if (key == null) continue;
+
                     // Check if split is right size. If not then skip it.
                     if (split.Length != 2) continue;
 
                     // Check if the key matches
-                    if (split[0] == kvp.Key)
+                    if (split[0] == key)
                     {
                         // What type is this?
                         bool success;
-                        switch (kvp.Value.type)
+                        switch (destination[key].type)
                         {
                             // Boolean
                             case Type t when t == typeof(bool):
                                 bool bVal;
                                 (bVal, success) = ReadParameter<bool>(split[1]);
-                                if (success) destination[kvp.Key] = (bVal, kvp.Value.type);
+                                if (success) destination[key] = (bVal, destination[key].type);
                                 break;
 
                             // Int
                             case Type t when t == typeof(int):
                                 int iVal;
                                 (iVal, success) = ReadParameter<int>(split[1]);
-                                if (success) destination[kvp.Key] = (iVal, kvp.Value.type);
+                                if (success) destination[key] = (iVal, destination[key].type);
                                 break;
 
                             // String
                             case Type t when t == typeof(string):
                                 string? sVal;
                                 (sVal, success) = ReadParameter<string>(split[1]);
-                                if (success && sVal != null) destination[kvp.Key] = (sVal, kvp.Value.type);
+                                if (success && sVal != null) destination[key] = (sVal, destination[key].type);
                                 break;
                         }
                     }
@@ -217,7 +224,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                 if (value == null || type == null)
                 {
                     // Log issue
-                    Debug.WriteLine($"Unable to load variable '{rawParameterValue.Substring(1)}', as variable does not exist!");
+                    DebugOut.Error($"Unable to load variable '{rawParameterValue.Substring(1)}', as variable does not exist!");
                     return (default, false);
                 }
 
@@ -225,7 +232,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                 if (type != typeof(VariableType))
                 {
                     // Log issue
-                    Debug.WriteLine($"Unable to load variable '{rawParameterValue.Substring(1)}', as types do not match!");
+                    DebugOut.Error($"Unable to load variable '{rawParameterValue.Substring(1)}', as types do not match!");
                     return (default, false);
                 }
 
@@ -240,7 +247,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                 case Type t when t == typeof(int):
                     // Parse it, on fail return null
                     if (int.TryParse(rawParameterValue, out int i)) return ((VariableType)(object)i, true);
-                    Debug.WriteLine($"Unable to parse parameter value '{rawParameterValue}' as an integer!");
+                    DebugOut.Error($"Unable to parse parameter value '{rawParameterValue}' as an integer!");
                     return (default, false);
 
                 // A string
@@ -250,7 +257,7 @@ namespace Oyster.Core.AbstractTypes.Commands
                         rawParameterValue[rawParameterValue.Length - 1] != Definitions.PARAMETER_STRING_DELIMINATOR)
                     {
                         // Return null
-                        Debug.WriteLine($"Parameter value '{rawParameterValue}' is not a valid string!");
+                        DebugOut.Error($"Parameter value '{rawParameterValue}' is not a valid string!");
                         return (default, false);
                     }
 
@@ -261,12 +268,12 @@ namespace Oyster.Core.AbstractTypes.Commands
                 case Type t when t == typeof(bool):
                     // Parse it, on fail return null
                     if (bool.TryParse(rawParameterValue, out bool b)) return ((VariableType)(object)b, true);
-                    Debug.WriteLine($"Unable to parse parameter value '{rawParameterValue}' as a boolean!");
+                    DebugOut.Error($"Unable to parse parameter value '{rawParameterValue}' as a boolean!");
                     return (default, false);
             }
 
             // Invalid type given
-            Debug.WriteLine($"Invalid type '{nameof(VariableType)}' provided!");
+            DebugOut.Error($"Invalid type '{nameof(VariableType)}' provided for variable!");
             return default;
         }
 

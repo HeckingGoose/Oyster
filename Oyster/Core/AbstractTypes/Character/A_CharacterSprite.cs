@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Oyster.Core.AbstractTypes.Character
 {
@@ -43,7 +42,7 @@ namespace Oyster.Core.AbstractTypes.Character
             }
 
             // Otherwise log and exit
-            Debug.WriteLine($"Unable to find sprite '{name}'.");
+            DebugOut.Warn($"Unable to find sprite '{name}'. Ignoring sprite change...");
             return false;
         }
     }

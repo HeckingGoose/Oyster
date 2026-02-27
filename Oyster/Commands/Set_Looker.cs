@@ -37,16 +37,24 @@ namespace Oyster.Commands
         }
         public override bool Run()
         {
+            // Skip if no camera
+            if (OysterMain.PlayerTalker!.Camera == null)
+            {
+                // Log it
+                DebugOut.Warn("Player does not have a camera! Skipping lookat.");
+                return true;
+            }
+
             // Check for default
             if (_name == DEFAULT_TARGET)
             {
                 // If so, set default and dip
-                OysterMain.PlayerTalker!.Camera.ResetLookTarget();
+                OysterMain.PlayerTalker!.Camera.ResetLookTarget_ToNPC();
                 return true;
             }
 
             // Direct set
-            OysterMain.PlayerTalker!.Camera.LookTargetName = _name;
+            OysterMain.PlayerTalker!.Camera.SetLookTargetByName(_name);
 
             // Now return true
             return true;

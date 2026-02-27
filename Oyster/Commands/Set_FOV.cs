@@ -33,6 +33,14 @@ namespace Oyster.Commands
         }
         public override bool Run()
         {
+            // Camera check
+            if (OysterMain.PlayerTalker!.Camera == null)
+            {
+                // Log issue
+                DebugOut.Warn("Player does not have a camera! Skipping FOV set.");
+                return true;
+            }
+
             // Direct set FOV
             OysterMain.PlayerTalker!.Camera.FOV = _fov;
 

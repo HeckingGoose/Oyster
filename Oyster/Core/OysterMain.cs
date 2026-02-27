@@ -335,8 +335,24 @@ namespace Oyster.Core
         {
             DebugOut.Log("Cleaning up conversation and quitting...");
 
-            // Tell the player's speech display to hide itself
-            if (_playerScript != null) _playerScript.SpeechDisplay.Hide();
+            if (_playerScript != null)
+            {
+                // Tell the player's speech display to hide itself
+                _playerScript.SpeechDisplay.Hide();
+
+                // If no camera, then ignore
+                if (_playerScript.Camera == null)
+                {
+                    // Log it
+                    DebugOut.Warn("Player does not have a camera! Skipping lookat reset.");
+                }
+                else
+                {
+                    // Tell the player to look where they should >:(
+                    _playerScript.Camera.ResetLookTarget_ToPlayer();
+                    _playerScript.Camera.SetNPCLookTarget(null);
+                }
+            }
 
             // And now tell the scene script to reset itself
             if (_sceneScript != null) _sceneScript.ShowObjectsPostChat();
@@ -458,8 +474,6 @@ namespace Oyster.Core
             _characterScript = characterTalker;
             DebugOut.Log("Cached all relevant scripts for conversation.");
 
-            // TODO: Figure out how to implement the 'lookers'
-
             // Tell the scene script to hide anything it needs to
             _sceneScript.HideObjectsForChat();
 
@@ -475,6 +489,20 @@ namespace Oyster.Core
             _playerScript.SpeechDisplay.Show();
             DebugOut.Log("Told the player to show their speech display.");
 
+            // Don't make player look at NPC if they do not have a camera
+            if (_playerScript.Camera == null)
+            {
+                // Log it
+                DebugOut.Warn("Player does not have a camera! Ignoring lookats.");
+            }
+            else
+            {
+                // Make player look at NPC
+                _playerScript.Camera.SetNPCLookTarget(_characterScript.NPCLooker);
+                _playerScript.Camera.ResetLookTarget_ToNPC();
+                DebugOut.Log("Made player look at the NPC.");
+            }
+
             // Begin loading the script for this conversation
             _scriptLoader = _characterScript.Data.BeginScriptLoad();
 
@@ -482,7 +510,7 @@ namespace Oyster.Core
             _scriptLoader.OnLoadFinished += OnScriptLoaded;
             _oysterState = SpeechState.Loading;
             _scriptLoader.BeginAssetLoad();
-            DebugOut.Log("Loading script for conversation.");
+            DebugOut.Log("Loading script for conversation...");
             return true;
         }
         /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace Oyster.Core.AbstractTypes
+﻿namespace Oyster.Core.AbstractTypes.Character
 {
     public abstract class A_Sprite
     {

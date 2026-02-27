@@ -1,5 +1,4 @@
-﻿using Oyster.Core.AbstractTypes;
-using Oyster.Core.AbstractTypes.Character;
+﻿using Oyster.Core.AbstractTypes.Character;
 
 namespace UnitTests.OysterImplementation.Character
 {

@@ -9,15 +9,21 @@ namespace Oyster.Core.AbstractTypes.Scene
     {
         // Protected Variables
         protected IShowAndHide[] _thingsToBeHiddenMidConversation;
+        protected A_Looker[] _lookers;
 
         // Constructor
-        public A_SceneScript(IShowAndHide[] thingsToBeHiddenMidConversation)
+        public A_SceneScript(
+            IShowAndHide[] thingsToBeHiddenMidConversation,
+            A_Looker[] lookers
+            )
         {
             // Pass Values
             _thingsToBeHiddenMidConversation = thingsToBeHiddenMidConversation;
+            _lookers = lookers;
 
             // Given the things are null, make a blank array
             if (_thingsToBeHiddenMidConversation == null) _thingsToBeHiddenMidConversation = Array.Empty<IShowAndHide>();
+            if (_lookers == null) _lookers = Array.Empty<A_Looker>();
         }
 
         // Public Methods
@@ -46,6 +52,15 @@ namespace Oyster.Core.AbstractTypes.Scene
         {
             // Iterate every object that needs to be shown, and then show them
             foreach (IShowAndHide sah in _thingsToBeHiddenMidConversation) { sah.Show(); }
+        }
+
+        // Accessors
+        /// <summary>
+        /// Gets a list of lookers for the current scene.
+        /// </summary>
+        public A_Looker[] Lookers
+        {
+            get { return _lookers; }
         }
     }
 }

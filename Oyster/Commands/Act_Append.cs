@@ -84,22 +84,26 @@ namespace Oyster.Commands
             t.RemoveAt(0);
             LoadOptionalParameterValues(t.ToArray(), ref optionals);
 
-            // Attempt to get variable for time between sounds
-            (object? value, Type? type) = Variables.GetVariableByName(Definitions.VARIABLE_NAME_MUMBLERATE);
-
             // Default value for this matches character speed
             float mumbleTime = OysterMain.CharacterTalker!.Data.TimeBetweenCharacters * 3f;
 
-            // If value exists and is correct type, read it in
-            if (value != null && type != null && type == typeof(int))
+            // Are we not muted?
+            if (!(bool)optionals[PARAMETER_MUTE_NAME].value)
             {
-                // Cast it and store
-                mumbleTime = 1f / (int)value;
-            }
-            else
-            {
-                // Log it
-                DebugOut.Log($"Integer variable '{Definitions.VARIABLE_NAME_MUMBLERATE}' does not exist, using time between characters as base for mumble timer.");
+                // Attempt to get variable for time between sounds
+                (object? value, Type? type) = Variables.GetVariableByName(Definitions.VARIABLE_NAME_MUMBLERATE);
+
+                // If value exists and is correct type, read it in
+                if (value != null && type != null && type == typeof(int))
+                {
+                    // Cast it and store
+                    mumbleTime = 1f / (int)value;
+                }
+                else
+                {
+                    // Log it
+                    DebugOut.Log($"Integer variable '{Definitions.VARIABLE_NAME_MUMBLERATE}' does not exist, using time between characters as base for mumble timer.");
+                }
             }
 
             // Make and return self

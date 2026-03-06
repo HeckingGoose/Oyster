@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Oyster.Core.AbstractTypes.Character.Sound
 {
@@ -95,6 +96,19 @@ namespace Oyster.Core.AbstractTypes.Character.Sound
         /// </summary>
         public void PlaySound(string soundName)
         {
+            // Have we been given no name?
+            if (soundName == string.Empty)
+            {
+                // In that case are we zero length?
+                if (_sounds.Count == 0) return;
+
+                // If not then pick a random one and go ahead!
+                PlaySound(_sounds[_sounds.Keys.ToArray()[Definitions.Rand.Next(0, _sounds.Count)]]);
+
+                // Dip
+                return;
+            }
+
             // Does this sound exist? If not then load it.
             if (!_sounds.ContainsKey(soundName))
             {

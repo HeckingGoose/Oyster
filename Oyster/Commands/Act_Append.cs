@@ -19,10 +19,13 @@ namespace Oyster.Commands
         public const string PARAMETER_MUTE_NAME = "mute";
 
         protected const int START_POS = 0;
+        protected const int COUNTER_MAX = 3;
 
         // Private Variables
         protected string _textToDisplay;
         protected float _timer;
+        protected float _mumbleTimer;
+        protected float _mumbleTime;
         protected int _currentCharacterIndex;
 
         // Constructors
@@ -30,7 +33,8 @@ namespace Oyster.Commands
             string textToDisplay,
             bool instant,
             bool waitForUserInput,
-            bool mute
+            bool mute,
+            float timeBetweenMumbles
             ) : base()
         {
             // Pass in values
@@ -38,9 +42,11 @@ namespace Oyster.Commands
             _optionalParameters.Add(PARAMETER_INSTANT_NAME, (instant, typeof(bool)));
             _optionalParameters.Add(PARAMETER_WAITFORUSERINPUT_NAME, (waitForUserInput, typeof(bool)));
             _optionalParameters.Add(PARAMETER_MUTE_NAME, (mute, typeof(bool)));
+            _mumbleTime = timeBetweenMumbles;
 
             // Default
             _timer = START_POS;
+            _mumbleTimer = START_POS;
             _currentCharacterIndex = START_POS;
         }
 
@@ -78,12 +84,31 @@ namespace Oyster.Commands
             t.RemoveAt(0);
             LoadOptionalParameterValues(t.ToArray(), ref optionals);
 
+            // Attempt to get variable for time between sounds
+            (object? value, Type? type) = Variables.GetVariableByName(Definitions.VARIABLE_NAME_MUMBLERATE);
+
+            // Default value for this matches character speed
+            float mumbleTime = OysterMain.CharacterTalker!.Data.TimeBetweenCharacters * 3f;
+
+            // If value exists and is correct type, read it in
+            if (value != null && type != null && type == typeof(int))
+            {
+                // Cast it and store
+                mumbleTime = 1f / (int)value;
+            }
+            else
+            {
+                // Log it
+                DebugOut.Log($"Integer variable '{Definitions.VARIABLE_NAME_MUMBLERATE}' does not exist, using time between characters as base for mumble timer.");
+            }
+
             // Make and return self
             return new Act_Append(
                 textToDisplay,
                 (bool)optionals[PARAMETER_INSTANT_NAME].value,
                 (bool)optionals[PARAMETER_WAITFORUSERINPUT_NAME].value,
-                (bool)optionals[PARAMETER_MUTE_NAME].value
+                (bool)optionals[PARAMETER_MUTE_NAME].value,
+                mumbleTime
                 );
         }
         public override bool Run()
@@ -102,6 +127,7 @@ namespace Oyster.Commands
             }
 
             // Are we ready for the next character?
+            bool charAdded = _timer > OysterMain.CharacterTalker!.Data.TimeBetweenCharacters;
             if (_timer > OysterMain.CharacterTalker!.Data.TimeBetweenCharacters)
             {
                 // Reset it
@@ -114,11 +140,24 @@ namespace Oyster.Commands
                 // Increment counter by this length
                 _currentCharacterIndex += toAdd.Length;
 
+                // Given we added rich text, don't play sound
+                charAdded &= toAdd.Length == 1;
+            }
+            // Check counter
+            if (_mumbleTimer >= _mumbleTime && charAdded)
+            {
+                _mumbleTimer -= _mumbleTime;
+
                 // Play a sound if we only had to add one character (In other words, this was not RTT) (oh and check null)
-                if (toAdd.Length == 1 && OysterMain.CharacterTalker.Sound != null)
+                if (OysterMain.CharacterTalker.Sound != null)
                 {
                     OysterMain.CharacterTalker.Sound.PlaySound(string.Empty);
                 }
+            }
+            else
+            {
+                // Increment counter
+                _mumbleTimer += Definitions.SECONDS_PER_TICK;
             }
 
             // Increment timer
@@ -179,5 +218,9 @@ namespace Oyster.Commands
         /// Returns whether this command will produce speech sounds or not.
         /// </summary>
         public bool Mute { get { return (bool)_optionalParameters[PARAMETER_MUTE_NAME].value; } }
+        /// <summary>
+        /// Returns the time in seconds between mumbles.
+        /// </summary>
+        public float TimeBetweenMumbles { get { return _mumbleTime; } }
     }
 }

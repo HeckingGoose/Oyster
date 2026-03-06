@@ -50,6 +50,13 @@ namespace Oyster.Commands
             // Length check
             if (rawParameters.Length < 1) return null;
 
+            // Check that we actually have a maintext to write to
+            if (OysterMain.PlayerTalker!.SpeechDisplay.MainText == null)
+            {
+                // Log it
+                DebugOut.Warn($"Player does not have a main text display! Skipping creation of command!");
+            }
+
             // Declare stores
             string? textToDisplay = string.Empty;
 
@@ -101,13 +108,17 @@ namespace Oyster.Commands
 
                 // Get a character and push it
                 string toAdd = ParseForRTT(_textToDisplay, _currentCharacterIndex);
-                OysterMain.PlayerTalker!.SpeechDisplay.MainText.Text += toAdd;
+                OysterMain.PlayerTalker!.SpeechDisplay.MainText!.Text += toAdd;
 
                 // Increment counter by this length
                 _currentCharacterIndex += toAdd.Length;
-            }
 
-            // TODO: Figure out how audio should be implemented
+                // Play a sound if we only had to add one character (In other words, this was not RTT)
+                if (toAdd.Length == 1)
+                {
+                    OysterMain.CharacterTalker.Sound.PlaySound(string.Empty);
+                }
+            }
 
             // Increment timer
             _timer += Definitions.SECONDS_PER_TICK;
@@ -136,7 +147,7 @@ namespace Oyster.Commands
         private void DumpAllRemaining()
         {
             // Then push all remaining characters
-            OysterMain.PlayerTalker!.SpeechDisplay.MainText.Text += _textToDisplay.Substring(_currentCharacterIndex);
+            OysterMain.PlayerTalker!.SpeechDisplay.MainText!.Text += _textToDisplay.Substring(_currentCharacterIndex);
 
             // And update position accordingly
             _currentCharacterIndex = _textToDisplay.Length;

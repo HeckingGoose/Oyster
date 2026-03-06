@@ -13,7 +13,7 @@
         }
 
         // Delegates
-        public delegate void AssetLoadedDelegate(LoadResult loadResult, string log);
+        public delegate void AssetLoadedDelegate(LoadResult loadResult, AssetType? asset, string log);
 
         // Events
         public AssetLoadedDelegate? OnLoadFinished;
@@ -28,12 +28,11 @@
         /// <summary>
         /// Should be called when the asset has completed loading.
         /// </summary>
-        /// <param name="asset">The resulting asset that was loaded.</param>
         /// <param name="loadResult">Whether the load was successful or not.</param>
         protected void InvokeOnAssetLoad(LoadResult loadResult, string log = DEFAULT_LOG)
         {
             // Call load completed event
-            if (OnLoadFinished != null) { OnLoadFinished(loadResult, log); }
+            if (OnLoadFinished != null) { OnLoadFinished(loadResult, Asset, log); }
         }
 
         // Public Method

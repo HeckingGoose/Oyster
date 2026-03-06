@@ -22,6 +22,14 @@ namespace Oyster.Commands
             // Length check
             if (rawParameters.Length < 1) return null;
 
+            // Check that character has ability to change sprite
+            if (OysterMain.CharacterTalker!.SpriteManager == null)
+            {
+                // Log and dip
+                DebugOut.Warn("Character does not have a sprite manager! Skipping creation of Set_Sprite.");
+                return null;
+            }
+
             // Cache
             string? name = string.Empty;
 
@@ -35,7 +43,7 @@ namespace Oyster.Commands
         public override bool Run()
         {
             // Direct set sprite via name
-            OysterMain.CharacterTalker!.SpriteManager.SetSprite(_name);
+            OysterMain.CharacterTalker!.SpriteManager!.SetSprite(_name);
 
             // Return true
             return true;

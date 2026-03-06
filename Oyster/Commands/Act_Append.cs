@@ -54,7 +54,8 @@ namespace Oyster.Commands
             if (OysterMain.PlayerTalker!.SpeechDisplay.MainText == null)
             {
                 // Log it
-                DebugOut.Warn($"Player does not have a main text display! Skipping creation of command!");
+                DebugOut.Warn("Player does not have a main text display! Skipping creation of command!");
+                return null;
             }
 
             // Declare stores
@@ -113,8 +114,8 @@ namespace Oyster.Commands
                 // Increment counter by this length
                 _currentCharacterIndex += toAdd.Length;
 
-                // Play a sound if we only had to add one character (In other words, this was not RTT)
-                if (toAdd.Length == 1)
+                // Play a sound if we only had to add one character (In other words, this was not RTT) (oh and check null)
+                if (toAdd.Length == 1 && OysterMain.CharacterTalker.Sound != null)
                 {
                     OysterMain.CharacterTalker.Sound.PlaySound(string.Empty);
                 }

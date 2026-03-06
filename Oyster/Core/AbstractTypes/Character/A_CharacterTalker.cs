@@ -7,15 +7,15 @@ namespace Oyster.Core.AbstractTypes.Character
     {
         // Protected Variables
         protected A_CharacterData _data;
-        protected A_CharacterSprite _spriteManager;
-        protected A_CharacterSound _sound;
+        protected A_CharacterSprite? _spriteManager;
+        protected A_CharacterSound? _sound;
         protected A_Looker _looker;
 
         // Constructor
         public A_CharacterTalker(
             A_CharacterData data,
-            A_CharacterSprite spriteManager,
-            A_CharacterSound sound,
+            A_CharacterSprite? spriteManager,
+            A_CharacterSound? sound,
             A_Looker looker
             )
         {
@@ -34,11 +34,11 @@ namespace Oyster.Core.AbstractTypes.Character
         /// <summary>
         /// Gets the sprite manager for this character.
         /// </summary>
-        public A_CharacterSprite SpriteManager { get { return _spriteManager; } }
+        public A_CharacterSprite? SpriteManager { get { return _spriteManager; } }
         /// <summary>
         /// Gets a reference to this character's sound player.
         /// </summary>
-        public A_CharacterSound Sound { get { return _sound; } }
+        public A_CharacterSound? Sound { get { return _sound; } }
         /// <summary>
         /// Gets a reference to this NPC's look target.
         /// </summary>

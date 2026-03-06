@@ -46,7 +46,7 @@ namespace Oyster.Commands
 
             // Default
             _timer = START_POS;
-            _mumbleTimer = START_POS;
+            _mumbleTimer = timeBetweenMumbles;
             _currentCharacterIndex = START_POS;
         }
 

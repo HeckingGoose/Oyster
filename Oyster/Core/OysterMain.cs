@@ -374,7 +374,6 @@ namespace Oyster.Core
             // Now null everything out
             _playerScript = null;
             _characterScript = null;
-            _sceneScript = null;
             _rawScript = null;
             _lineMarkers = null;
 
@@ -498,9 +497,12 @@ namespace Oyster.Core
             _playerScript.SpeechDisplay.ResetDisplay();
 
             // And now we should update the display using the character info
-            _playerScript.SpeechDisplay.NameText.Text = _characterScript.Data.DisplayName;
-            _playerScript.SpeechDisplay.NameText.TextColour = _characterScript.Data.DisplayNameColour;
-            DebugOut.Log("Finished prepping speech display.");
+            if (_playerScript.SpeechDisplay.NameText != null)
+            {
+                _playerScript.SpeechDisplay.NameText.Text = _characterScript.Data.DisplayName;
+                _playerScript.SpeechDisplay.NameText.TextColour = _characterScript.Data.DisplayNameColour;
+                DebugOut.Log("Finished prepping speech display.");
+            }
 
             // Now let's show the speech box since it's all set-up
             _playerScript.SpeechDisplay.Show();

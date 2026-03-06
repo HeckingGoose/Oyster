@@ -259,7 +259,15 @@ namespace Oyster.Core
             _script[_nextCommandToLoadIndex] = command;
 
             // Is this command something that modifies variables? If so then we can't load more commands, as they may depend on variables existing.
-            if (_script[_nextCommandToLoadIndex] is IModifiesVariables) _safeToLoadMoreCommands = false;
+            if (_script[_nextCommandToLoadIndex] is IModifiesVariables)
+            {
+                _safeToLoadMoreCommands = false;
+                DebugOut.Log("Loaded command that modifies variables! Future commands will not be loaded until this command is run.");
+            }
+            else
+            {
+                DebugOut.Log($"Loaded command '{_script[_nextCommandToLoadIndex]}'");
+            }
 
             // And increment to the next line
             _nextCommandToLoadIndex++;
@@ -287,11 +295,17 @@ namespace Oyster.Core
                         break;
                     }
 
+                    // Make debug out quiet
+                    DebugOut.Enabled = false;
+
                     // Now cache line markers
                     _lineMarkers = GenLineMarkers(_rawScript);
 
                     // And now cache version info
                     (_scriptGame, _scriptVersion) = GenScriptVersion(metaTags);
+
+                    // Wake it up again
+                    DebugOut.Enabled = true;
 
                     // Log potential issues
                     (string oysterGame, string oysterVer) = GetVersionNumberAndName();
@@ -408,6 +422,9 @@ namespace Oyster.Core
             // Is the current line not loaded?
             if (_script[_currentCommandIndex] == null)
             {
+                // Mark safe
+                _safeToLoadMoreCommands = true;
+
                 // If not then load it and update the loader
                 _nextCommandToLoadIndex = _currentCommandIndex;
                 LoadNextCommand();
@@ -434,8 +451,8 @@ namespace Oyster.Core
             // Otherwise we should process the current line
             if (_script[_currentCommandIndex]!.Run())
             {
-                _currentCommandIndex++;
                 DebugOut.Log($"Running {_script[_currentCommandIndex]!.ToString()}");
+                _currentCommandIndex++;
             }
 
             // Is it safe to load more lines?

@@ -1,9 +1,10 @@
 ﻿using Oyster.Core;
 using Oyster.Core.AbstractTypes.Commands;
+using Oyster.Core.Interfaces.Commands;
 
 namespace Oyster.Commands
 {
-    public abstract class Set_Var<VariableType> : A_Command
+    public abstract class Set_Var<VariableType> : A_Command, IModifiesVariables
     {
         // Private Variables
         protected string _name;

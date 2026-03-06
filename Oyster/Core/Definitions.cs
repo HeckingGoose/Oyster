@@ -1,7 +1,12 @@
-﻿namespace Oyster.Core
+﻿using System;
+
+namespace Oyster.Core
 {
     internal static class Definitions
     {
+        // Random
+        internal static readonly Random Rand = new Random();
+
         // Metadata Definitions
         internal const string VERSION_NUMBER_STRING = "4.1.0";
         internal const string VERSION_NAME_STRING = "Base";
@@ -44,5 +49,8 @@
         // Tickrate Definitions
         internal const int TICKS_PER_SECOND = 80;
         internal const float SECONDS_PER_TICK = 1f / TICKS_PER_SECOND;
+
+        // Variables
+        internal const string VARIABLE_NAME_MUMBLERATE = "mumblesPerSecond";
     }
 }

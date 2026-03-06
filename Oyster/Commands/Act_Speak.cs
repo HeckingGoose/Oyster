@@ -10,8 +10,9 @@ namespace Oyster.Commands
             string textToDisplay,
             bool instant,
             bool waitForUserInput,
-            bool mute
-            ) : base(textToDisplay, instant, waitForUserInput, mute) { }
+            bool mute,
+            float timeBetweenMumbles
+            ) : base(textToDisplay, instant, waitForUserInput, mute, timeBetweenMumbles) { }
 
         // Explicit Interface Implementations
         public static new ISpeechCommand? MakeSelf(string[] rawParameters)
@@ -23,7 +24,7 @@ namespace Oyster.Commands
             if (a == null) return null;
 
             // Now read its values
-            return new Act_Speak(a.TextToDisplay, a.Instant, a.WaitForUserInput, a.Mute);
+            return new Act_Speak(a.TextToDisplay, a.Instant, a.WaitForUserInput, a.Mute, a.TimeBetweenMumbles);
         }
         public override bool Run()
         {
@@ -31,7 +32,7 @@ namespace Oyster.Commands
             if (_currentCharacterIndex == START_POS)
             {
                 // Clear text box
-                OysterMain.PlayerTalker!.SpeechDisplay.MainText.Text = string.Empty;
+                OysterMain.PlayerTalker!.SpeechDisplay.MainText!.Text = string.Empty;
             }
 
             return base.Run();

@@ -267,7 +267,7 @@ namespace Oyster.Core
         /// <summary>
         /// Called when _scriptLoader finishes.
         /// </summary>
-        private static void OnScriptLoaded(A_BackgroundAssetLoader<string>.LoadResult loadResult, string log)
+        private static void OnScriptLoaded(A_BackgroundAssetLoader<string>.LoadResult loadResult, string script, string log)
         {
             // Did it load successfully?
             switch (loadResult)

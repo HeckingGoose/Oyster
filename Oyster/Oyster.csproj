@@ -17,6 +17,7 @@ https://oyster.abulman.com</Description>
     <RepositoryUrl>https://github.com/HeckingGoose/Oyster</RepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Version>$(VersionPrefix)</Version>
   </PropertyGroup>
 
   <ItemGroup>

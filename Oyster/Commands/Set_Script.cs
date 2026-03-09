@@ -34,6 +34,14 @@ namespace Oyster.Commands
         }
         public override bool Run()
         {
+            // Check empty
+            if (_name == string.Empty)
+            {
+                // Revert
+                OysterMain.CharacterTalker!.Data.RevertScript();
+                return true;
+            }
+
             // Direct set script name
             OysterMain.CharacterTalker!.Data.SetScript(_name);
 

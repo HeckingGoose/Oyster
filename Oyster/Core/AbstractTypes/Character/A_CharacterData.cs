@@ -4,6 +4,10 @@ namespace Oyster.Core.AbstractTypes.Character
 {
     public abstract class A_CharacterData
     {
+        // Events
+        public delegate void OnScriptSetDelegate(string scriptName);
+        public OnScriptSetDelegate? OnScriptSet;
+
         // Protected Variables
         protected string _displayName;
         protected Colour _displayNameColour;
@@ -32,7 +36,11 @@ namespace Oyster.Core.AbstractTypes.Character
         /// Sets which script this character should use.
         /// </summary>
         /// <param name="scriptName">The name of the script to use.</param>
-        public abstract void SetScript(string scriptName);
+        public virtual void SetScript(string scriptName) { if (OnScriptSet != null) OnScriptSet(scriptName); }
+        /// <summary>
+        /// Swaps the character's target script back to their last script.
+        /// </summary>
+        public abstract void RevertScript();
 
         // Accessors
         /// <summary>

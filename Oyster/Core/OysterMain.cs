@@ -6,6 +6,7 @@ using Oyster.Core.AbstractTypes.Scene;
 using Oyster.Core.Interfaces.Commands;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Oyster.Core
 {
@@ -307,6 +308,11 @@ namespace Oyster.Core
                     // Wake it up again
                     DebugOut.Enabled = true;
 
+                    // Log made line markers
+                    string madeLineMarkers = "Generated line markers: ";
+                    foreach (string marker in _lineMarkers.Keys.ToArray()) madeLineMarkers += $"{marker}, ";
+                    DebugOut.Log(madeLineMarkers);
+
                     // Log potential issues
                     (string oysterGame, string oysterVer) = GetVersionNumberAndName();
                     if (oysterGame != _scriptGame) DebugOut.Warn($"Warning! Script game and Oyster game do not match, some script commands may not be supported (Oyster: {oysterGame}, Script: {_scriptGame})!");
@@ -372,7 +378,6 @@ namespace Oyster.Core
             if (_sceneScript != null) _sceneScript.ShowObjectsPostChat();
 
             // Now null everything out
-            _playerScript = null;
             _characterScript = null;
             _rawScript = null;
             _lineMarkers = null;
@@ -447,10 +452,9 @@ namespace Oyster.Core
             // If not, then hide prompt and reset counter
             else { if (_playerScript!.SpeechDisplay.ContinuePrompt != null) _playerScript.SpeechDisplay.ContinuePrompt.Hide(); _promptWaitTimer = 0; }
 
-            // Otherwise we should process the current line
             if (_script[_currentCommandIndex]!.Run())
             {
-                DebugOut.Log($"Running {_script[_currentCommandIndex]!.ToString()}");
+                if (_script[_currentCommandIndex] != null) DebugOut.Log($"Finished running {_script[_currentCommandIndex]!.ToString()}");
                 _currentCommandIndex++;
             }
 
@@ -610,6 +614,9 @@ namespace Oyster.Core
 
                 // Now null out every command
                 UnloadAllCommands();
+
+                // Log it
+                DebugOut.Log($"Jumped to line marker '{lineMarkerName}'");
             }
         }
 

@@ -21,9 +21,12 @@ namespace Oyster.Core
         {
             // Does the key exist? If so then return value
             if (_variables.ContainsKey(name)) return _variables[name];
-
-            // If not then return null
-            else return (null, null);
+            else
+            {
+                // If not then return null
+                DebugOut.Warn($"Variable '{name}' does not exist!");
+                return (null, null);
+            }
         }
         /// <summary>
         /// Creates a named variable with a given value.

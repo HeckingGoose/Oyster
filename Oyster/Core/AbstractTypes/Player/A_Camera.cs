@@ -39,9 +39,13 @@ namespace Oyster.Core.AbstractTypes.Player
                     {
                         // Set looker
                         _lookTarget = looker;
+                        return;
                     }
                 }
             }
+
+            // We didn't find any so log it
+            DebugOut.Warn($"Look target '{targetName}' doesn't exist in scene!");
         }
         /// <summary>
         /// Sets the NPC looker of this camera to the given target.
